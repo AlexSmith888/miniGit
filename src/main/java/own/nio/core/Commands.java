@@ -7,6 +7,7 @@ public enum Commands {
     HISTORY("history"),
     DIFF("diff"),
     TRACK("track"),
+    UNDO("undo"),
     RESTORE("restore");
 
     private final String comm;

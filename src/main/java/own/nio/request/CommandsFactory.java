@@ -2,20 +2,19 @@ package own.nio.request;
 
 import own.nio.core.Command;
 import own.nio.core.Commands;
-import own.nio.validation.CommitValidation;
-import own.nio.validation.DiffValidation;
-import own.nio.validation.InitValidation;
-import own.nio.validation.RestoreValidation;
 
 import java.io.IOException;
 
-public class RequestsFactory {
+public class CommandsFactory {
     static public Command handler(String command) {
         if (Commands.INIT.get().equals(command)) {
-            return new MiniGitInit();
+            return new InitCommand();
         }
         if (Commands.TRACK.get().equals(command)) {
             return new TrackCommand();
+        }
+        if (Commands.UNDO.get().equals(command)) {
+            return new UndoCommand();
         }
         /*if (Commands.COMMIT.get().equals(command)) {
             return new ;

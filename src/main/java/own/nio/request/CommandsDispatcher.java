@@ -1,24 +1,28 @@
 package own.nio.request;
 
-import own.nio.core.Command;
 import own.nio.core.Commands;
-import own.nio.core.Validation;
-import own.nio.validation.FactoryValidation;
-import own.nio.validation.InitValidation;
+import own.nio.validation.ValidationFactory;
 
 import java.io.IOException;
 
 public class CommandsDispatcher {
+    public void assemble(String[] rows) throws IOException {
+        String command = rows[0];
+        ValidationFactory.returnValidation(command).isValid(rows);
+        CommandsFactory.handler(command).execute(rows);
+    }
     public void process(String[] rows) throws IOException {
         String command = rows[0];
         if (Commands.INIT.get().equals(command)) {
-            FactoryValidation.returnValidation(command).isValid(rows);
-            RequestsFactory.handler(command).execute(rows);
+            assemble(rows);
             return;
         }
         if (Commands.TRACK.get().equals(command)) {
-            FactoryValidation.returnValidation(command).isValid(rows);
-            RequestsFactory.handler(command).execute(rows);
+            assemble(rows);
+            return;
+        }
+        if (Commands.UNDO.get().equals(command)) {
+            assemble(rows);
             return;
         }
         /*if (Commands.COMMIT.get().equals(command)) {

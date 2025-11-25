@@ -43,7 +43,7 @@ public class TrackDirectoryTree implements FileVisitor {
     public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) throws IOException {
         Path current = (Path) dir;
         if (dir.equals(target)) {
-            System.out.println("Skipping : " + target.getParent());
+            //System.out.println("Skipping : " + target.getParent());
             return FileVisitResult.SKIP_SUBTREE;
         }
         try {
@@ -64,9 +64,12 @@ public class TrackDirectoryTree implements FileVisitor {
             Path suggested = workingArea.resolve(source.relativize(current));
             if (Files.exists(suggested)) {
                 if (!compareFiles(current, suggested)) {
-                    System.out.println(source + " " + suggested);
+                    //System.out.println(source + " " + suggested);
                     Files.copy(current, suggested, REPLACE_EXISTING);
                 }
+            }
+            else {
+                Files.copy(current, suggested, REPLACE_EXISTING);
             }
         } catch (IOException e) {
             return FileVisitResult.TERMINATE;

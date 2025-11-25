@@ -21,7 +21,7 @@ public class InputValidation implements Validation {
     @Override
     public void isValid(String [] item) throws IllegalArgumentException {
         if (item.length == 0) {
-            throw new ClassCastException("An empty command");
+            throw new IllegalArgumentException("An empty command");
         }
 
         if (!isCommandExists(item[0])) {

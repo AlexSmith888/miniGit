@@ -1,13 +1,21 @@
 import own.nio.request.CommandsDispatcher;
+import own.nio.utils.CachedDirectories;
 import own.nio.utils.InputProcessing;
 import own.nio.validation.InputValidation;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+    static List<Path> miniGitDirectories = new ArrayList<>();
+
     static void main() {
         GitInitializer.launch();
+        ResourcesLoader.launch(miniGitDirectories);
         Scanner scanner = new Scanner(System.in);
         String text;
 
@@ -21,7 +29,6 @@ public class Main {
             }
 
             try {
-
                 new InputValidation().isValid(
                         InputProcessing.returnInitInput(text));
                 new CommandsDispatcher().process(
@@ -37,6 +44,7 @@ public class Main {
         }
 
         scanner.close();
+        ResourcesLoader.finish();
         GitInitializer.finish();
     }
 }

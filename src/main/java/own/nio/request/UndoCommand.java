@@ -1,29 +1,31 @@
 package own.nio.request;
 
 import own.nio.core.Command;
+import own.nio.utils.CachedDirectories;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class TrackCommand implements Command {
+public class UndoCommand implements Command {
     @Override
     public void execute(Object[] items) throws IOException {
         String[] arr = (String[]) items;
 
         Path source = Path.of(arr[1]);
         Path vcsFolder = source.resolve("miniGit");
-        Path workingArea = vcsFolder.resolve("temp");
 
         try {
-            //TRAVERSE THE TREE TO TRACK DELETED
-            Files.walkFileTree(source, new TrackDirectoryTree(source, vcsFolder, workingArea));
-            Files.walkFileTree(workingArea, new DeleteDirectoryTree(workingArea, source));
+            Files.walkFileTree(vcsFolder, new UndoDirectoryTree());
+            if (CachedDirectories.returnDirectories().contains(source)) {
+                CachedDirectories.returnDirectories().remove(source);
+            }
         } catch (IOException e) {
-            IO.println("Impossible to track changes");
+            IO.println("Impossible to delete miniGit folder");
             System.out.println(e.getMessage());
-            throw new IOException("impossible to complete init command");
+            throw new IOException("impossible to complete undo command");
         }
     }
 }

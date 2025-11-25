@@ -18,7 +18,7 @@ public class InitValidation implements Validation {
             throw new IllegalArgumentException("Should be an existing directory");
         }
 
-        String vcs = ".vcs";
+        String vcs = "miniGit";
         Path vcsFolder = Path.of(directory + "/" + vcs);
         if (Files.exists(vcsFolder)) {
             throw new IllegalArgumentException("The directory is Already under the miniGit maintenance");
