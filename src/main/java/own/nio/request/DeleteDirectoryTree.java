@@ -39,7 +39,6 @@ public class DeleteDirectoryTree implements FileVisitor {
             Files.delete(filepath);
             /*System.out.format("Removing the file %s from working directory %s"
                     ,filepath.toFile(), filepath.getParent());*/
-            IO.println("\n");
         }
         return CONTINUE;
     }

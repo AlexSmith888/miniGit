@@ -11,11 +11,9 @@ import java.util.Scanner;
 
 public class Main {
 
-    static List<Path> miniGitDirectories = new ArrayList<>();
-
     static void main() {
         GitInitializer.launch();
-        ResourcesLoader.launch(miniGitDirectories);
+        ResourcesLoader.launch();
         Scanner scanner = new Scanner(System.in);
         String text;
 

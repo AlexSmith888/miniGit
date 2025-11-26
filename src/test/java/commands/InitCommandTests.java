@@ -44,8 +44,6 @@ public class InitCommandTests {
                 + " " + System.currentTimeMillis());
 
         Files.createDirectory(source);
-        new CachedDirectories(miniGitDirectories);
-
         instance.execute(new String[]{"init", source.toString()});
 
 
@@ -103,7 +101,6 @@ public class InitCommandTests {
         createDirs(dirs);
         createFiles(files);
 
-        new CachedDirectories(miniGitDirectories);
         instance.execute(new String[]{"init", directory.toString()});
 
         Path vcsFolder = directory.resolve("miniGit");

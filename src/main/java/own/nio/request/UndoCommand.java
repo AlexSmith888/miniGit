@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UndoCommand implements Command {
     @Override
@@ -19,9 +21,7 @@ public class UndoCommand implements Command {
 
         try {
             Files.walkFileTree(vcsFolder, new UndoDirectoryTree());
-            if (CachedDirectories.returnDirectories().contains(source)) {
-                CachedDirectories.returnDirectories().remove(source);
-            }
+            CachedDirectories.removeDirectory(source);
         } catch (IOException e) {
             IO.println("Impossible to delete miniGit folder");
             System.out.println(e.getMessage());
