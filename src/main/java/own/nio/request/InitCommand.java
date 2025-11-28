@@ -1,6 +1,7 @@
 package own.nio.request;
 
 import own.nio.core.Command;
+import own.nio.core.MIniGitClass;
 import own.nio.utils.CachedDirectories;
 
 import java.io.IOException;
@@ -9,22 +10,17 @@ import java.nio.file.Path;
 
 public class InitCommand implements Command {
     @Override
-    public void execute(Object[] items) throws IOException {
-        String[] arr = (String[]) items;
-
-        Path source = Path.of(arr[1]);
-        Path vcsFolder = source.resolve("miniGit");
-        Path workingArea = vcsFolder.resolve("temp");
-        Path commitsTree = vcsFolder.resolve("commits");
+    public void execute(MIniGitClass entity) throws IOException {
 
         try {
-            Files.createDirectory(vcsFolder);
-            Files.createDirectory(workingArea);
-            Files.createDirectory(commitsTree);
-            if (!CachedDirectories.returnDirectories().contains(source)) {
-                CachedDirectories.returnDirectories().add(source);
+            Files.createDirectory(entity.returnSourceGitDir());
+            Files.createDirectory(entity.returnSourceGitTempDir());
+            Files.createDirectory(entity.returnSourceGitCommitDir());
+            if (!CachedDirectories.returnDirectories().contains(entity.returnSourceDir())) {
+                CachedDirectories.returnDirectories().add(entity.returnSourceDir());
             }
-            Files.walkFileTree(source, new MoveDirectoryTree(source, workingArea));
+            Files.walkFileTree(entity.returnSourceDir()
+                    , new MoveDirectoryTree(entity.returnSourceDir(), entity.returnSourceGitTempDir()));
         } catch (IOException e) {
             IO.println("Impossible to create .vcs folder");
             System.out.println(e.getMessage());

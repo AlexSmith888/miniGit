@@ -2,15 +2,18 @@ package own.nio.validation;
 
 import own.nio.core.Validation;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class CommitValidation implements Validation {
     @Override
     public void isValid(String[] item) throws IllegalArgumentException {
-        if (item.length < 2) {
-            throw new IllegalArgumentException("Requires a second parameter. " +
-                    "Choose a directory to be watched");
+        if (item.length < 3) {
+            throw new IllegalArgumentException("Requires a {commit}" +
+                    "{ path}{ \"message - either blank or not\"}}");
         }
 
         Path directory = Path.of(item[1]);
@@ -18,9 +21,9 @@ public class CommitValidation implements Validation {
             throw new IllegalArgumentException("Should be an existing directory");
         }
 
-        if (!Files.isDirectory(Path.of(directory + "/miniGit"))) {
+        Path mainGitDir = directory.resolve("miniGit");
+        if (!Files.isDirectory(mainGitDir)) {
             throw new IllegalArgumentException("Should be under miniGit control");
         }
-
     }
 }

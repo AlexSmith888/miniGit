@@ -55,6 +55,11 @@ public class DeleteDirectoryTree implements FileVisitor {
     public FileVisitResult postVisitDirectory(Object dir, IOException exc) throws IOException {
         Path filepath = (Path) dir;
         Path  sourceFile = source.resolve(source.relativize(filepath));
+
+        sourceFile = Path.of(sourceFile.toString()
+                .replace("/temp", "")
+                .replace("miniGit", ""));
+
         if (!Files.exists(sourceFile)) {
             /*System.out.format("Removing the directory %s from working directory tree"
                     ,filepath.toFile());

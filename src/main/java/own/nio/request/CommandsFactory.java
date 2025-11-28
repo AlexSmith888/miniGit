@@ -2,6 +2,7 @@ package own.nio.request;
 
 import own.nio.core.Command;
 import own.nio.core.Commands;
+import own.nio.core.MIniGitClass;
 
 import java.io.IOException;
 
@@ -16,18 +17,21 @@ public class CommandsFactory {
         if (Commands.UNDO.get().equals(command)) {
             return new UndoCommand();
         }
-        /*if (Commands.COMMIT.get().equals(command)) {
-            return new ;
+        if (Commands.COMMIT.get().equals(command)) {
+            return new CommitCommand();
         }
-        if (Commands.RESTORE.get().equals(command)) {
-            return new RestoreValidation();
+        if (Commands.HISTORY.get().equals(command)) {
+            return new HistoryCommand();
         }
         if (Commands.DIFF.get().equals(command)) {
-            return new DiffValidation();
+            return new DiffCommand();
+        }
+        /*if (Commands.RESTORE.get().equals(command)) {
+            return new RestoreValidation();
         }*/
         return new Command() {
             @Override
-            public void execute(Object[] items) throws IOException {
+            public void execute(MIniGitClass entity) throws IOException {
 
             }
         };

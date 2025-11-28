@@ -17,6 +17,9 @@ public class ValidationFactory {
         if (Commands.COMMIT.get().equals(command)) {
             return new CommitValidation();
         }
+        if (Commands.HISTORY.get().equals(command)) {
+            return new HistoryValidation();
+        }
         if (Commands.RESTORE.get().equals(command)) {
             return new RestoreValidation();
         }
@@ -26,7 +29,6 @@ public class ValidationFactory {
         return new Validation(){
             @Override
             public void isValid(String[] item) throws IllegalArgumentException {
-
             }
         };
     }

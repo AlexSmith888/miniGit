@@ -3,6 +3,7 @@ package commands;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import own.nio.core.MIniGitClass;
 import own.nio.request.InitCommand;
 import own.nio.request.MoveDirectoryTree;
 import own.nio.utils.CachedDirectories;
@@ -44,7 +45,14 @@ public class InitCommandTests {
                 + " " + System.currentTimeMillis());
 
         Files.createDirectory(source);
-        instance.execute(new String[]{"init", source.toString()});
+        instance.execute((MIniGitClass) new MIniGitClass.Builder()
+                .withRawData(new String[]{"init", source.toString()})
+                .withCommand()
+                .withSourceDir()
+                .withSourceGitDir()
+                .withSourceGitTempDir()
+                .withSourceGitCommitDir()
+                .build());
 
 
         Path vcsFolder = source.resolve("miniGit");
@@ -101,7 +109,14 @@ public class InitCommandTests {
         createDirs(dirs);
         createFiles(files);
 
-        instance.execute(new String[]{"init", directory.toString()});
+        instance.execute((MIniGitClass) new MIniGitClass.Builder()
+                .withRawData(new String[]{"init", directory.toString()})
+                .withCommand()
+                .withSourceDir()
+                .withSourceGitDir()
+                .withSourceGitTempDir()
+                .withSourceGitCommitDir()
+                .build());
 
         Path vcsFolder = directory.resolve("miniGit");
         Path workingArea = vcsFolder.resolve("temp");

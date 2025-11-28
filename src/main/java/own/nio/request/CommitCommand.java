@@ -1,6 +1,9 @@
 package own.nio.request;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import own.nio.core.Command;
+import own.nio.core.MIniGitClass;
+import own.nio.utils.CachedCommitTrees;
 import own.nio.utils.EncryptCommitPaths;
 
 import java.io.File;
@@ -10,39 +13,76 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HexFormat;
+import java.util.Map;
 
 public class CommitCommand implements Command {
 
     @Override
-    public void execute(Object[] items) throws IOException {
-        String[] arr = (String[]) items;
+    public void execute(MIniGitClass entity) throws IOException {
 
-        Path source = Path.of(arr[1]);
-        Path vcsFolder = source.resolve("miniGit");
-        Path workingArea = vcsFolder.resolve("temp");
-        Path commitArea = vcsFolder.resolve("commits");
-
-        EncryptCommitPaths.process(source);
+        EncryptCommitPaths.process(entity.returnSourceDir());
         String shortIndentifier =  EncryptCommitPaths.getShortHash();
         String longIndentifier = EncryptCommitPaths.getLongHash();
-        String full = EncryptCommitPaths.getHash();
+        String fullHash = EncryptCommitPaths.getHash();
 
-        Path mainCommitDirectory = commitArea.resolve(shortIndentifier);
-        Path mainDataCommitDirectory = mainCommitDirectory.resolve(longIndentifier);
-
+        Path mainCommitDirectory ;
+        Path mainDataCommitDirectory;
         try {
-            //Files.walkFileTree(source, new TrackDirectoryTree(source, vcsFolder, workingArea));
-            //Files.walkFileTree(workingArea, new DeleteDirectoryTree(workingArea, source));
+            mainCommitDirectory = entity.returnSourceGitCommitDir().resolve(shortIndentifier);
+            mainDataCommitDirectory = mainCommitDirectory.resolve(longIndentifier);
             Files.createDirectory(mainCommitDirectory);
             Files.createDirectory(mainDataCommitDirectory);
-            Files.walkFileTree(workingArea,
-                    new MoveCommitTree(workingArea, "temp",
-                            "commits" + "/" + shortIndentifier + "/" + longIndentifier));
+        } catch (IOException e) {
+            IO.println("The issue while creating a commit directory");
+            throw e;
+        }
+
+        try {
+            String replacedDirectory = "temp";
+            String tobeRepalcedWith = "commits/"
+                    + shortIndentifier + "/" + longIndentifier;
+
+            Files.walkFileTree(entity.returnSourceGitTempDir(),
+                    new MoveCommitTree(
+                            entity.returnSourceGitTempDir()
+                            , replacedDirectory
+                            , tobeRepalcedWith));
         } catch (IOException e) {
             IO.println("Impossible to commit changes");
             System.out.println(e.getMessage());
             throw e;
+        }
+
+        String tmstp = String.valueOf(System.currentTimeMillis());
+        Map<String, String> data = Map.of(
+                "short", shortIndentifier,
+                "long", longIndentifier,
+                "commit", fullHash,
+                "timestamp", tmstp,
+                "source", entity.returnSourceDir().toString(),
+                "message", entity.returnCommitMessage()
+        );
+
+        writeJsonToTheDisk(mainCommitDirectory, data);
+        CachedCommitTrees.addToTree(entity.returnSourceDir(), shortIndentifier);
+    }
+    public void writeJsonToTheDisk (Path mainCommitDirectory, Map<String, String> data){
+        ObjectMapper mapper = new ObjectMapper();
+        Path file = Path.of(mainCommitDirectory + "/meta.json");
+        try {
+
+            if (Files.exists(file)) {
+                System.out.println("The same file exist ... ");
+            }
+
+            mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(file.toFile(), data);
+            System.out.println("Attempting to save " +
+                    "a json file on the disk : " + file);
+        } catch (IOException e) {
+            System.out.println("Failed to create a Json file");
         }
     }
 }

@@ -1,4 +1,5 @@
 import own.nio.request.CommandsDispatcher;
+import own.nio.utils.CachedCommitTrees;
 import own.nio.utils.CachedDirectories;
 import own.nio.utils.InputProcessing;
 
@@ -13,8 +14,10 @@ import java.util.List;
 public class ResourcesLoader {
     static public void launch () {
         CachedDirectories.loadCachedData();
+        CachedCommitTrees.loadCachedData();
     }
     static public void finish () {
         CachedDirectories.unLoadCachedData();
+        CachedCommitTrees.unLoadCachedData();
     }
 }
