@@ -36,7 +36,7 @@ public class Main {
                 IO.println("Illegal input parameters");
                 System.out.println(e.getMessage());
             } catch (IOException e) {
-                IO.println("check whether directories / files exist");
+                IO.println("Check whether directories / files exist");
                 System.out.println(e.getMessage());
             }
         }

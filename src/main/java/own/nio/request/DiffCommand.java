@@ -18,8 +18,7 @@ public class DiffCommand implements Command {
         ObjectMapper json = new ObjectMapper();
         String longName = "";
         try {
-            ObjectNode root = (ObjectNode) json.readTree(path.toString() + "/" + meta);
-            System.out.println(path.toString() + "/" + meta);
+            ObjectNode root = (ObjectNode) json.readTree(Path.of(path.toString() + "/" + meta).toFile());
             longName = root.get("long").asText();
         } catch (IOException e) {
         }
@@ -33,14 +32,16 @@ public class DiffCommand implements Command {
         Path dir2 = Path.of(entity.returnSourceGitCommitDir()
                 + "/" + entity.returnCommitShort2());
 
-        dir1 = returnfullPath(dir1, entity.returnMetaFile());
-        dir2 = returnfullPath(dir2, entity.returnMetaFile());
+        Path fullPath1 = returnfullPath(dir1, entity.returnMetaFile());
+        Path fullPath2 = returnfullPath(dir2, entity.returnMetaFile());
 
-        System.out.println(dir1 + " " + dir2 + " are compared ");
+        String tobeReplaced1 = entity.returnCommitShort1() + "/" + fullPath1.getFileName();
+        String tobeReplaced2 = entity.returnCommitShort2() + "/" + fullPath2.getFileName();
 
-        Files.walkFileTree(dir1,
-                new DiffDirectoryTree(dir1, entity.returnCommitShort1(), entity.returnCommitShort2()));
-        Files.walkFileTree(dir2,
-                new DiffDirectoryTree(dir2, entity.returnCommitShort2(), entity.returnCommitShort1()));
+        Files.walkFileTree(fullPath1,
+                new DiffDirectoryTree(fullPath1, tobeReplaced1, tobeReplaced2));
+        Files.walkFileTree(fullPath2,
+                new DiffDirectoryTree(fullPath2, tobeReplaced2, tobeReplaced1));
+
     }
 }

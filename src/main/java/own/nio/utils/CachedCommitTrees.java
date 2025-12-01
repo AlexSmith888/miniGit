@@ -1,8 +1,11 @@
 package own.nio.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import own.nio.request.CommandsDispatcher;
 
 import javax.sql.rowset.serial.SerialStruct;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +80,32 @@ public class CachedCommitTrees {
             queue.add(next);
         }
     }
+    static public void removeSubTree(String commit, Path commits, String meta){
+        if (!commitsTrees.containsKey(commit)) {
+            System.out.println("Nothing to remove yet ..");
+            return;
+        }
+        Queue<String> queue = new LinkedList<>();
+        queue.add(commitsTrees.get(commit));
+        while (!queue.isEmpty()) {
+            String par = queue.poll();
+            if (par.isEmpty()) {
+                break;
+            }
+            String next = commitsTrees.get(par);
+            commitsTrees.remove(par);
+
+            Path dir1 = Path.of(commits + "/" + par);
+            dir1 = returnfullPath(dir1, meta);
+            try {
+                Files.deleteIfExists(dir1);
+            } catch (IOException e) {
+
+            }
+            queue.add(next);
+        }
+        commitsTrees.put(commit, "");
+    }
     static public String getLastCommit(Path dir){
         String parent = dir.toString();
         Queue<String> queue = new LinkedList<>();
@@ -102,7 +131,18 @@ public class CachedCommitTrees {
             commitsTrees.put(curr, "");
         }
         else {
-            commitsTrees.put(dir.toString(), "");
+            commitsTrees.put(dir.toString(), curr);
+            commitsTrees.put(curr, "");
         }
+    }
+    static private Path returnfullPath(Path path, String meta){
+        ObjectMapper json = new ObjectMapper();
+        String longName = "";
+        try {
+            ObjectNode root = (ObjectNode) json.readTree(Path.of(path + "/" + meta).toFile());
+            longName = root.get("long").asText();
+        } catch (IOException e) {
+        }
+        return Path.of(path + "/" + longName);
     }
 }

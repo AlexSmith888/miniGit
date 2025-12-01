@@ -89,6 +89,21 @@ public class CommandsDispatcher {
                     .withCommitName1()
                     .withCommitName2()
                     .build());
+            return;
+        }
+        if (Commands.RESTORE.get().equals(command)) {
+            check(command, rows);
+            assemble((MIniGitClass) new MIniGitClass.Builder()
+                    .withRawData(rows)
+                    .withCommand()
+                    .withSourceDir()
+                    .withMetaFile()
+                    .withSourceGitCommitDir()
+                    .withSourceGitDir()
+                    .withCommitName1()
+                    .withSourceGitTempDir()
+                    .build());
+            return;
         }
     }
 }

@@ -46,6 +46,7 @@ public class DiffDirectoryTree implements FileVisitor {
         if (dir.equals(root)) {
             return CONTINUE;
         }
+
         Path inverted = Path.of(path.toString().replace(short1, short2));
 
         if (!Files.exists(inverted)) {

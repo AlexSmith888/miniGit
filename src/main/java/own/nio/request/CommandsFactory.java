@@ -26,9 +26,9 @@ public class CommandsFactory {
         if (Commands.DIFF.get().equals(command)) {
             return new DiffCommand();
         }
-        /*if (Commands.RESTORE.get().equals(command)) {
-            return new RestoreValidation();
-        }*/
+        if (Commands.RESTORE.get().equals(command)) {
+            return new RestoreCommand();
+        }
         return new Command() {
             @Override
             public void execute(MIniGitClass entity) throws IOException {
