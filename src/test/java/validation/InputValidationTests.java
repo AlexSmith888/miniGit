@@ -3,10 +3,9 @@ package validation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import own.nio.core.Commands;
-import own.nio.validation.InputValidation;
+import domain.services.Requests;
+import app.validations.InputValidation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +28,7 @@ public class InputValidationTests {
     @Test
     @DisplayName("All the commands are listed in a dedicated ENUM type")
     void assertCommandExistInEnum(){
-        for (var command : Commands.values()) {
+        for (var command : Requests.values()) {
             assertDoesNotThrow(() -> instance.isValid(new String[]{command.get()}));
         }
     }

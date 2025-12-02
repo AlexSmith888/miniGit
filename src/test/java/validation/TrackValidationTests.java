@@ -3,10 +3,9 @@ package validation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import own.nio.validation.TrackValidation;
+import app.validations.TrackValidation;
 
 import java.nio.file.Path;
-import java.security.spec.ECField;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

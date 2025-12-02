@@ -1,17 +1,15 @@
-import own.nio.request.CommandsDispatcher;
-import own.nio.utils.CachedDirectories;
-import own.nio.utils.InputProcessing;
-import own.nio.validation.InputValidation;
+import cli.GitInitializer;
+import cli.ResourcesLoader;
+import domain.services.RequestsDispatcher;
+import utils.CLiParser;
+import app.validations.InputValidation;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    static void main() {
+    public static void main(String [] args) {
         GitInitializer.launch();
         ResourcesLoader.launch();
         Scanner scanner = new Scanner(System.in);
@@ -19,7 +17,7 @@ public class Main {
 
         while (true) {
             GitInitializer.help();
-            IO.println(" > ");
+            System.out.println(" > ");
             text = scanner.nextLine().trim().toLowerCase();
 
             if (text.equals("exit")) {
@@ -28,15 +26,15 @@ public class Main {
 
             try {
                 new InputValidation().isValid(
-                        InputProcessing.returnInitInput(text));
-                new CommandsDispatcher().process(
-                        InputProcessing.returnInitInput(text));
+                        CLiParser.returnInitInput(text));
+                new RequestsDispatcher().process(
+                        CLiParser.returnInitInput(text));
 
             } catch (IllegalArgumentException e) {
-                IO.println("Illegal input parameters");
+                System.out.println("Illegal input parameters");
                 System.out.println(e.getMessage());
             } catch (IOException e) {
-                IO.println("Check whether directories / files exist");
+                System.out.println("Check whether directories / files exist");
                 System.out.println(e.getMessage());
             }
         }
