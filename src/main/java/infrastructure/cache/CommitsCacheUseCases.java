@@ -16,7 +16,7 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
     private HashMap<String, String> commits;
     private FileSystemGateway fsGateway;
 
-    CommitsCacheUseCases(HashMap<String, String> commits, FileSystemGateway FsGateway) {
+    public CommitsCacheUseCases(HashMap<String, String> commits, FileSystemGateway FsGateway) {
         this.commits = commits;
         this.fsGateway = FsGateway;
     }
@@ -64,7 +64,8 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
             try {
                 fsGateway.removeDir(dir1);
             } catch (IOException e) {
-
+                System.out.println("Failed to remove dir : " + dir1);
+                e.printStackTrace();
             }
             queue.add(next);
         }
@@ -77,6 +78,7 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
             ObjectNode root = (ObjectNode) json.readTree(Path.of(path + "/" + meta).toFile());
             longName = root.get("long").asText();
         } catch (IOException e) {
+            System.out.println("Failed to get a full path");
         }
         return Path.of(path + "/" + longName);
     }
@@ -116,5 +118,25 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
             commits.put(dir.toString(), value);
             commits.put(value, "");
         }
+    }
+
+    @Override
+    public HashMap<String, String> retrieveSubtree(String dir) {
+        HashMap<String, String> map = new HashMap<>();
+        Queue<String> queue = new LinkedList<>();
+        queue.add(dir);
+
+        while (!queue.isEmpty()) {
+            String par = queue.poll();
+            String next = commits.get(par);
+            if (next.isEmpty()) {
+                map.put(par, "");
+                return map;
+            }
+            map.put(par, next);
+            queue.add(next);
+        }
+
+        return map;
     }
 }

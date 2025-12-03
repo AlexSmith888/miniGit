@@ -20,9 +20,9 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
 
     @Override
     public void removeDir(Path path) throws IOException {
-        if (Files.exists(path) && Files.isDirectory(path)) {
-            List<Path> files = Files.list(path).toList();
-            if (files.isEmpty()) {
+        if (Files.isDirectory(path)) {
+            List<Path> ls = Files.list(path).toList();
+            if (ls.isEmpty()) {
                 Files.delete(path);
             }
         }
@@ -78,5 +78,9 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
             Files.writeString(source, row, StandardOpenOption.APPEND);
             Files.writeString(source, "\n", StandardOpenOption.APPEND);
         }
+    }
+    @Override
+    public List<String> readTheFile(Path path) throws IOException {
+        return Files.readAllLines(path);
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import infrastructure.filesystem.MoveCommitTree;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
-import infrastructure.cache.CachedCommitTrees;
 import infrastructure.encryption.EncryptCommitPaths;
 
 import java.io.IOException;
@@ -27,8 +26,8 @@ public class Commit implements Request {
         try {
             mainCommitDirectory = entity.returnSourceGitCommitDir().resolve(shortIndentifier);
             mainDataCommitDirectory = mainCommitDirectory.resolve(longIndentifier);
-            Files.createDirectory(mainCommitDirectory);
-            Files.createDirectory(mainDataCommitDirectory);
+            entity.returnFileSystem().createDir(mainCommitDirectory);
+            entity.returnFileSystem().createDir(mainDataCommitDirectory);
         } catch (IOException e) {
             System.out.println("The issue while creating a commit directory");
             throw e;
@@ -61,7 +60,9 @@ public class Commit implements Request {
         );
 
         writeJsonToTheDisk(mainCommitDirectory, data);
-        CachedCommitTrees.addToTree(entity.returnSourceDir(), shortIndentifier);
+        //CachedCommitTrees.addToTree(entity.returnSourceDir(), shortIndentifier);
+        entity.returnCommitsCache()
+                .addCommitToTree(entity.returnSourceDir(), shortIndentifier);
     }
     public void writeJsonToTheDisk (Path mainCommitDirectory, Map<String, String> data){
         ObjectMapper mapper = new ObjectMapper();

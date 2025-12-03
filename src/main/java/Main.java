@@ -1,6 +1,9 @@
 import cli.GitInitializer;
-import cli.ResourcesLoader;
 import domain.services.RequestsDispatcher;
+import infrastructure.cache.CachedRepositories;
+import infrastructure.cache.CommitsCache;
+import infrastructure.cache.CommitsCacheUseCases;
+import infrastructure.entities.*;
 import utils.CLiParser;
 import app.validations.InputValidation;
 
@@ -8,10 +11,18 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-
-    public static void main(String [] args) {
+    public static void main(String[] args) throws IOException {
         GitInitializer.launch();
-        ResourcesLoader.launch();
+        FileSystemGateway fsGate = new LocalFsTasksExecutor();
+        CommitsCacheLoader commitsCache = new CommitsCache(fsGate);
+        RepositoriesGateway repoGate = new CachedRepositories(fsGate);
+        CommitsCacheGateway commitsGW = new CommitsCacheUseCases(
+                commitsCache.returnCurrentState(),
+                fsGate
+        );
+
+        commitsCache.loadInMemory();
+        repoGate.loadCachedDirs();
         Scanner scanner = new Scanner(System.in);
         String text;
 
@@ -28,7 +39,7 @@ public class Main {
                 new InputValidation().isValid(
                         CLiParser.returnInitInput(text));
                 new RequestsDispatcher().process(
-                        CLiParser.returnInitInput(text));
+                        CLiParser.returnInitInput(text), commitsGW, repoGate, fsGate);
 
             } catch (IllegalArgumentException e) {
                 System.out.println("Illegal input parameters");
@@ -40,7 +51,8 @@ public class Main {
         }
 
         scanner.close();
-        ResourcesLoader.finish();
+        commitsCache.flushToTheDisk();
+        repoGate.unLoadCachedDirs();
         GitInitializer.finish();
     }
 }

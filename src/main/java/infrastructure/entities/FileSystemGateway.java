@@ -2,6 +2,7 @@ package infrastructure.entities;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface FileSystemGateway {
     public void createDir(Path path) throws IOException;
@@ -13,4 +14,5 @@ public interface FileSystemGateway {
     public boolean isDirExists(Path source) throws IOException;
     public boolean isFileExists(Path source) throws IOException;
     public void appendArowToTheFile(Path source, String row) throws IOException;
+    public List<String> readTheFile(Path source) throws IOException;
 }

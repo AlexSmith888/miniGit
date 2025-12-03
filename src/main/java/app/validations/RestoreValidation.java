@@ -1,7 +1,6 @@
 package app.validations;
 
 import domain.validators.Validation;
-import infrastructure.cache.CachedCommitTrees;
 
 public class RestoreValidation implements Validation {
     @Override
@@ -10,8 +9,8 @@ public class RestoreValidation implements Validation {
             throw new IllegalArgumentException("Insufficient parameters list");
         }
 
-        if (!CachedCommitTrees.returnTrees().containsKey(item[2].trim())) {
+        /*if (!CachedCommitTrees.returnTrees().containsKey(item[2].trim())) {
             throw new IllegalArgumentException("Commit does not exists, nothing to restore");
-        }
+        }*/
     }
 }

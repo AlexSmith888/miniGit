@@ -1,6 +1,9 @@
 package domain.services;
 
 import domain.entities.MIniGitRepository;
+import infrastructure.entities.CommitsCacheGateway;
+import infrastructure.entities.FileSystemGateway;
+import infrastructure.entities.RepositoriesGateway;
 
 import java.io.IOException;
 
@@ -13,24 +16,28 @@ public class RequestsDispatcher {
         ValidationFactory.returnValidation(command)
                 .isValid(rows);
     }
-    public void process(String[] rows) throws IOException {
+    public void process(String[] rows, CommitsCacheGateway commitsCache
+            , RepositoriesGateway repoGW, FileSystemGateway gw) throws IOException {
         String command = rows[0];
         if (Requests.INIT.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
-                            .withRawData(rows)
-                            .withCommand()
-                            .withSourceDir()
-                            .withSourceGitDir()
-                            .withSourceGitTempDir()
-                            .withSourceGitCommitDir()
-                            .build());
+                    .withRawData(rows)
+                    .withRepositories(repoGW)
+                    .withFileSystem(gw)
+                    .withCommand()
+                    .withSourceDir()
+                    .withSourceGitDir()
+                    .withSourceGitTempDir()
+                    .withSourceGitCommitDir()
+                    .build());
             return;
         }
         if (Requests.TRACK.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
+                    .withFileSystem(gw)
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitDir()
@@ -43,6 +50,9 @@ public class RequestsDispatcher {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
+                    .withCommitsCache(commitsCache)
+                    .withRepositories(repoGW)
+                    .withFileSystem(gw)
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitDir()
@@ -55,6 +65,8 @@ public class RequestsDispatcher {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
+                    .withCommitsCache(commitsCache)
+                    .withFileSystem(gw)
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitDir()
@@ -68,6 +80,8 @@ public class RequestsDispatcher {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
+                    .withCommitsCache(commitsCache)
+                    .withFileSystem(gw)
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitCommitDir()
@@ -79,6 +93,7 @@ public class RequestsDispatcher {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
+                    .withFileSystem(gw)
                     .withCommand()
                     .withSourceDir()
                     .withMetaFile()
@@ -92,6 +107,8 @@ public class RequestsDispatcher {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
+                    .withCommitsCache(commitsCache)
+                    .withFileSystem(gw)
                     .withCommand()
                     .withSourceDir()
                     .withMetaFile()

@@ -1,5 +1,9 @@
 package domain.entities;
 
+import infrastructure.entities.CommitsCacheGateway;
+import infrastructure.entities.FileSystemGateway;
+import infrastructure.entities.RepositoriesGateway;
+
 import java.nio.file.Path;
 
 public class MIniGitRepository implements MiniGitEntity {
@@ -13,6 +17,9 @@ public class MIniGitRepository implements MiniGitEntity {
     private final String metaFile;
     private final String short1;
     private final String short2;
+    private final CommitsCacheGateway commitsGW;
+    private final RepositoriesGateway repos;
+    FileSystemGateway fsGateway;
 
     private MIniGitRepository(Builder builder) {
         this.sourceDir = builder.sourceDir;
@@ -25,6 +32,9 @@ public class MIniGitRepository implements MiniGitEntity {
         this.metaFile = builder.metaFile;
         this.short1 = builder.short1;
         this.short2 = builder.short2;
+        this.commitsGW = builder.commitsGW;
+        this.repos = builder.repos;
+        this.fsGateway = builder.fsGateway;
     }
 
     static public class Builder {
@@ -39,6 +49,24 @@ public class MIniGitRepository implements MiniGitEntity {
         private String metaFile;
         private String short1;
         private String short2;
+        private CommitsCacheGateway commitsGW;
+        private RepositoriesGateway repos;
+        private FileSystemGateway fsGateway;
+
+        public Builder withFileSystem (FileSystemGateway gw){
+            this.fsGateway = gw;
+            return this;
+        }
+
+        public Builder withRepositories (RepositoriesGateway repos){
+            this.repos = repos;
+            return this;
+        }
+
+        public Builder withCommitsCache (CommitsCacheGateway gw){
+            this.commitsGW = gw;
+            return this;
+        }
 
         public Builder withRawData (String[] arr){
             this.sourceRawData = arr;
@@ -126,4 +154,7 @@ public class MIniGitRepository implements MiniGitEntity {
     public String returnMetaFile() {return metaFile;}
     public String returnCommitShort1() {return short1;}
     public String returnCommitShort2() {return short2;}
+    public CommitsCacheGateway returnCommitsCache() {return commitsGW;}
+    public RepositoriesGateway returnRepos() {return repos;}
+    public FileSystemGateway returnFileSystem() {return fsGateway;}
 }

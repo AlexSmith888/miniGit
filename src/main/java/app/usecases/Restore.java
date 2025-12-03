@@ -7,7 +7,6 @@ import domain.entities.MIniGitRepository;
 import infrastructure.filesystem.CopyDirectoryTree;
 import infrastructure.filesystem.PurgeDirectoryTree;
 import infrastructure.filesystem.PurgeTempDirectoryTree;
-import infrastructure.cache.CachedCommitTrees;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,8 +49,10 @@ public class Restore implements Request {
         }
 
         //Path dir, Path commits, String meta
-        CachedCommitTrees.removeSubTree(entity.returnCommitShort1()
-                ,entity.returnSourceGitCommitDir(), entity.returnMetaFile());
+        //CachedCommitTrees.removeSubTree(entity.returnCommitShort1(),entity.returnSourceGitCommitDir(), entity.returnMetaFile());
+        entity.returnCommitsCache().removeCommitsSubTree(entity.returnCommitShort1()
+                        ,entity.returnSourceGitCommitDir()
+                        ,entity.returnMetaFile());
 
     }
 }

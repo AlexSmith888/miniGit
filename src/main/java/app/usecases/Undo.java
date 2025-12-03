@@ -3,8 +3,6 @@ package app.usecases;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
 import infrastructure.filesystem.UndoDirectoryTree;
-import infrastructure.cache.CachedCommitTrees;
-import infrastructure.cache.CachedDirectories;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,8 +17,10 @@ public class Undo implements Request {
 
         try {
             Files.walkFileTree(vcsFolder, new UndoDirectoryTree());
-            CachedDirectories.removeDirectory(source);
-            CachedCommitTrees.removeTree(source);
+            entity.returnRepos().returnCachedDirectories()
+                    .remove(source);
+            entity.returnCommitsCache()
+                    .removeCommitsTree(source);
         } catch (IOException e) {
             System.out.println("Impossible to delete miniGit folder");
             System.out.println(e.getMessage());

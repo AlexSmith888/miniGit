@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
-import infrastructure.cache.CachedCommitTrees;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +17,8 @@ public class History implements Request {
         String parent = entity.returnSourceDir().toString();
         Queue<String> queue = new LinkedList<>();
         queue.add(parent);
-        HashMap<String, String> mapa = CachedCommitTrees.returnTrees();
+        HashMap<String, String> mapa = entity.returnCommitsCache()
+                .retrieveSubtree(parent);
 
         while (!queue.isEmpty()) {
             String par = queue.poll();
