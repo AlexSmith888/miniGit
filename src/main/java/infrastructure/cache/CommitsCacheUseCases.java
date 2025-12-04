@@ -44,7 +44,7 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
     }
 
     @Override
-    public void removeCommitsSubTree(String commit, Path commitsTree, String meta) {
+    public void removeCommitsSubTree(String commit, Path commitsTree, String meta) throws IOException {
         if (!commits.containsKey(commit)) {
             System.out.println("Nothing to remove yet ..");
             return;
@@ -58,19 +58,11 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
             }
             String next = commits.get(par);
             commits.remove(par);
-
-            Path dir1 = Path.of(commitsTree + "/" + par);
-            dir1 = returnfullPath(dir1, meta);
-            try {
-                fsGateway.removeDir(dir1);
-            } catch (IOException e) {
-                System.out.println("Failed to remove dir : " + dir1);
-                e.printStackTrace();
-            }
             queue.add(next);
         }
         commits.put(commit, "");
     }
+
     private Path returnfullPath(Path path, String meta){
         ObjectMapper json = new ObjectMapper();
         String longName = "";

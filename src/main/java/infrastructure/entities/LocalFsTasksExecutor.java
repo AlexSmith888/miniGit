@@ -2,6 +2,7 @@ package infrastructure.entities;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -82,5 +83,24 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
     @Override
     public List<String> readTheFile(Path path) throws IOException {
         return Files.readAllLines(path);
+    }
+
+    @Override
+    public void copyRecursively(Path source, FileVisitor worker) throws IOException {
+        Files.walkFileTree(source, worker);
+    }
+
+    @Override
+    public void deleteRecursively(Path source, FileVisitor worker) throws IOException {
+        Files.walkFileTree(source, worker);
+    }
+    @Override
+    public void eraseRecursively(Path source, FileVisitor worker) throws IOException {
+        Files.walkFileTree(source, worker);
+    }
+
+    @Override
+    public void viewDifference(Path source, FileVisitor worker) throws IOException {
+        Files.walkFileTree(source, worker);
     }
 }

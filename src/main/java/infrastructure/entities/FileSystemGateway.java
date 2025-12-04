@@ -1,6 +1,7 @@
 package infrastructure.entities;
 
 import java.io.IOException;
+import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -15,4 +16,9 @@ public interface FileSystemGateway {
     public boolean isFileExists(Path source) throws IOException;
     public void appendArowToTheFile(Path source, String row) throws IOException;
     public List<String> readTheFile(Path source) throws IOException;
+    public void copyRecursively(Path source, FileVisitor worker) throws IOException;
+    public void deleteRecursively(Path source, FileVisitor worker) throws IOException;
+    public void eraseRecursively(Path source, FileVisitor worker) throws IOException;
+    public void viewDifference(Path source, FileVisitor worker) throws IOException;
+
 }

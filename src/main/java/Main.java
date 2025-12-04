@@ -4,10 +4,17 @@ import infrastructure.cache.CachedRepositories;
 import infrastructure.cache.CommitsCache;
 import infrastructure.cache.CommitsCacheUseCases;
 import infrastructure.entities.*;
+import infrastructure.filescomparison.ByteToByteComparator;
+import infrastructure.filescomparison.FilesComparator;
+import infrastructure.filesystem.Cleaner;
+import infrastructure.filesystem.Copier;
+import infrastructure.filesystem.Eraser;
+import infrastructure.filesystem.Viewer;
 import utils.CLiParser;
 import app.validations.InputValidation;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Main {
@@ -17,9 +24,13 @@ public class Main {
         CommitsCacheLoader commitsCache = new CommitsCache(fsGate);
         RepositoriesGateway repoGate = new CachedRepositories(fsGate);
         CommitsCacheGateway commitsGW = new CommitsCacheUseCases(
-                commitsCache.returnCurrentState(),
-                fsGate
-        );
+                commitsCache.returnCurrentState(), fsGate);
+
+        FilesComparator diff = new ByteToByteComparator();
+        Copier copier = new Copier();
+        Eraser eraser = new Eraser();
+        Cleaner cleaner = new Cleaner();
+        Viewer viewer = new Viewer(diff);
 
         commitsCache.loadInMemory();
         repoGate.loadCachedDirs();
@@ -39,7 +50,8 @@ public class Main {
                 new InputValidation().isValid(
                         CLiParser.returnInitInput(text));
                 new RequestsDispatcher().process(
-                        CLiParser.returnInitInput(text), commitsGW, repoGate, fsGate);
+                        CLiParser.returnInitInput(text), commitsGW
+                        ,repoGate, fsGate, copier, eraser, cleaner, viewer);
 
             } catch (IllegalArgumentException e) {
                 System.out.println("Illegal input parameters");

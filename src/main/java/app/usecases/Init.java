@@ -2,15 +2,12 @@ package app.usecases;
 
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
-import infrastructure.filesystem.MoveDirectoryTree;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class Init implements Request {
     @Override
     public void execute(MIniGitRepository entity) throws IOException {
-
         try {
             entity.returnFileSystem().createDir(entity.returnSourceGitDir());
             entity.returnFileSystem().createDir(entity.returnSourceGitTempDir());
@@ -22,12 +19,16 @@ public class Init implements Request {
                         .add(entity.returnSourceDir());
             }
 
-            Files.walkFileTree(entity.returnSourceDir()
-                    , new MoveDirectoryTree(entity.returnSourceDir(), entity.returnSourceGitTempDir()));
+            entity.returnCopier().setSource(entity.returnSourceDir());
+            entity.returnCopier().setTarget(entity.returnSourceGitTempDir());
+            entity.returnCopier().addToExcludedList(entity.returnSourceGitDir());
+            entity.returnFileSystem().copyRecursively(entity.returnSourceDir()
+                    ,entity.returnCopier());
+
         } catch (IOException e) {
-            System.out.println("Impossible to create .vcs folder");
+            System.out.println("Impossible to create a miniGit repository");
             System.out.println(e.getMessage());
-            throw new IOException("impossible to complete init command");
+            throw e;
         }
     }
 }

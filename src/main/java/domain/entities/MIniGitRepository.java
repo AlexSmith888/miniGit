@@ -3,7 +3,12 @@ package domain.entities;
 import infrastructure.entities.CommitsCacheGateway;
 import infrastructure.entities.FileSystemGateway;
 import infrastructure.entities.RepositoriesGateway;
+import infrastructure.filesystem.Cleaner;
+import infrastructure.filesystem.Copier;
+import infrastructure.filesystem.Eraser;
+import infrastructure.filesystem.Viewer;
 
+import javax.swing.text.View;
 import java.nio.file.Path;
 
 public class MIniGitRepository implements MiniGitEntity {
@@ -19,7 +24,11 @@ public class MIniGitRepository implements MiniGitEntity {
     private final String short2;
     private final CommitsCacheGateway commitsGW;
     private final RepositoriesGateway repos;
-    FileSystemGateway fsGateway;
+    private final FileSystemGateway fsGateway;
+    private final Copier copier;
+    private final Cleaner cleaner;
+    private final Eraser eraser;
+    private final Viewer viewer;
 
     private MIniGitRepository(Builder builder) {
         this.sourceDir = builder.sourceDir;
@@ -35,6 +44,10 @@ public class MIniGitRepository implements MiniGitEntity {
         this.commitsGW = builder.commitsGW;
         this.repos = builder.repos;
         this.fsGateway = builder.fsGateway;
+        this.copier = builder.copier;
+        this.cleaner = builder.cleaner;
+        this.eraser = builder.eraser;
+        this.viewer = builder.viewer;
     }
 
     static public class Builder {
@@ -52,6 +65,30 @@ public class MIniGitRepository implements MiniGitEntity {
         private CommitsCacheGateway commitsGW;
         private RepositoriesGateway repos;
         private FileSystemGateway fsGateway;
+        private Copier copier;
+        private Cleaner cleaner;
+        private Eraser eraser;
+        private Viewer viewer;
+
+        public Builder withViewer (Viewer viewer){
+            this.viewer = viewer;
+            return this;
+        }
+
+        public Builder withEraser (Eraser eraser){
+            this.eraser = eraser;
+            return this;
+        }
+
+        public Builder withCleaner (Cleaner cleaner){
+            this.cleaner = cleaner;
+            return this;
+        }
+
+        public Builder withCopier (Copier copier){
+            this.copier = copier;
+            return this;
+        }
 
         public Builder withFileSystem (FileSystemGateway gw){
             this.fsGateway = gw;
@@ -157,4 +194,8 @@ public class MIniGitRepository implements MiniGitEntity {
     public CommitsCacheGateway returnCommitsCache() {return commitsGW;}
     public RepositoriesGateway returnRepos() {return repos;}
     public FileSystemGateway returnFileSystem() {return fsGateway;}
+    public Copier returnCopier() {return copier;}
+    public Cleaner returnCleaner() {return cleaner;}
+    public Eraser returnEraser() {return eraser;}
+    public Viewer returnViewer() {return viewer;}
 }

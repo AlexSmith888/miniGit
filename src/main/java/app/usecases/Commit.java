@@ -1,7 +1,6 @@
 package app.usecases;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import infrastructure.filesystem.MoveCommitTree;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
 import infrastructure.encryption.EncryptCommitPaths;
@@ -34,15 +33,10 @@ public class Commit implements Request {
         }
 
         try {
-            String replacedDirectory = "temp";
-            String tobeRepalcedWith = "commits/"
-                    + shortIndentifier + "/" + longIndentifier;
-
-            Files.walkFileTree(entity.returnSourceGitTempDir(),
-                    new MoveCommitTree(
-                            entity.returnSourceGitTempDir()
-                            , replacedDirectory
-                            , tobeRepalcedWith));
+            entity.returnCopier().setSource(entity.returnSourceGitTempDir());
+            entity.returnCopier().setTarget(mainDataCommitDirectory);
+            entity.returnFileSystem().copyRecursively(entity.returnSourceGitTempDir()
+                    , entity.returnCopier());
         } catch (IOException e) {
             System.out.println("Impossible to commit changes");
             System.out.println(e.getMessage());

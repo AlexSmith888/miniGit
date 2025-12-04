@@ -1,12 +1,13 @@
 package infrastructure.entities;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 
 public interface CommitsCacheGateway {
     void removeCommitsTree(Path dir);
 
-    void removeCommitsSubTree(String commit, Path commitsTree, String meta);
+    void removeCommitsSubTree(String commit, Path commitsTree, String meta) throws IOException;
 
     String getLastCommitForParent(Path dir);
 
