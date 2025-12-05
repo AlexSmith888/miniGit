@@ -10,4 +10,5 @@ public interface RepositoriesGateway {
 
     public List<Path> returnCachedDirectories();
     public void removeFromCache(Path dir) throws IOException;
+    void addToCache(Path dir) throws IOException;
 }

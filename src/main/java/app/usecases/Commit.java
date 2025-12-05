@@ -1,34 +1,29 @@
 package app.usecases;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
-import infrastructure.encryption.EncryptCommitPaths;
+import infrastructure.storage.JsonContract;
+import infrastructure.storage.JsonEntity;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
-public class Commit implements Request {
+public class Commit implements Request, JsonContract {
 
     @Override
     public void execute(MIniGitRepository entity) throws IOException {
-
-        EncryptCommitPaths.process(entity.returnSourceDir());
-        String shortIndentifier =  EncryptCommitPaths.getShortHash();
-        String longIndentifier = EncryptCommitPaths.getLongHash();
-        String fullHash = EncryptCommitPaths.getHash();
-
         Path mainCommitDirectory ;
         Path mainDataCommitDirectory;
         try {
-            mainCommitDirectory = entity.returnSourceGitCommitDir().resolve(shortIndentifier);
-            mainDataCommitDirectory = mainCommitDirectory.resolve(longIndentifier);
+            entity.returnCipher().process(entity.returnSourceDir());
+            mainCommitDirectory = entity.returnSourceGitCommitDir().resolve(
+                    entity.returnCipher().getShortHash());
+            mainDataCommitDirectory = mainCommitDirectory.resolve(
+                    entity.returnCipher().getLongHash());
             entity.returnFileSystem().createDir(mainCommitDirectory);
             entity.returnFileSystem().createDir(mainDataCommitDirectory);
         } catch (IOException e) {
-            System.out.println("The issue while creating a commit directory");
+            System.out.println("The issue while creating commit directories");
             throw e;
         }
 
@@ -38,41 +33,60 @@ public class Commit implements Request {
             entity.returnFileSystem().copyRecursively(entity.returnSourceGitTempDir()
                     , entity.returnCopier());
         } catch (IOException e) {
-            System.out.println("Impossible to commit changes");
+            System.out.println("Copying files to commit directories failed");
             System.out.println(e.getMessage());
             throw e;
         }
 
-        String tmstp = String.valueOf(System.currentTimeMillis());
-        Map<String, String> data = Map.of(
-                "short", shortIndentifier,
-                "long", longIndentifier,
-                "commit", fullHash,
-                "timestamp", tmstp,
-                "source", entity.returnSourceDir().toString(),
-                "message", entity.returnCommitMessage()
-        );
-
-        writeJsonToTheDisk(mainCommitDirectory, data);
-        //CachedCommitTrees.addToTree(entity.returnSourceDir(), shortIndentifier);
-        entity.returnCommitsCache()
-                .addCommitToTree(entity.returnSourceDir(), shortIndentifier);
-    }
-    public void writeJsonToTheDisk (Path mainCommitDirectory, Map<String, String> data){
-        ObjectMapper mapper = new ObjectMapper();
-        Path file = Path.of(mainCommitDirectory + "/meta.json");
         try {
 
-            if (Files.exists(file)) {
-                System.out.println("The same file exist ... ");
-            }
+            setShortFolderIdentifier(entity.returnJson(), entity.returnCipher().getShortHash());
+            setLongFolderIdentifier(entity.returnJson(), entity.returnCipher().getLongHash());
+            setFullFolderIdentifier(entity.returnJson(), entity.returnCipher().getHash());
+            setEventTimestamp(entity.returnJson(), String.valueOf(System.currentTimeMillis()));
+            setCommitSourceFolder(entity.returnJson(), entity.returnSourceDir().toString());
+            setCommitMessage(entity.returnJson(), entity.returnCommitMessage());
 
-            mapper.writerWithDefaultPrettyPrinter()
-                    .writeValue(file.toFile(), data);
-            System.out.println("Attempting to save " +
-                    "a json file on the disk : " + file);
+            entity.returnFileSystem().writeJsonToTheDisk(
+                    Path.of(mainCommitDirectory + "/" + entity.returnMetaFile())
+                    , entity.returnJson());
+
+            entity.returnCommitsCache()
+                    .addCommitToTree(entity.returnSourceDir(), entity.returnCipher().getShortHash());
+
         } catch (IOException e) {
             System.out.println("Failed to create a Json file");
+            throw e;
         }
+    }
+
+    @Override
+    public void setShortFolderIdentifier(JsonEntity entity, String value) {
+        entity.setShortFolderIdentifier(value);
+    }
+
+    @Override
+    public void setLongFolderIdentifier(JsonEntity entity, String value) {
+        entity.setlongFolderIdentifier(value);
+    }
+
+    @Override
+    public void setFullFolderIdentifier(JsonEntity entity, String value) {
+        entity.setfullFolderIdentifier(value);
+    }
+
+    @Override
+    public void setEventTimestamp(JsonEntity entity, String value) {
+        entity.seteventTimestamp(value);
+    }
+
+    @Override
+    public void setCommitMessage(JsonEntity entity, String value) {
+        entity.setCommitMessage(value);
+    }
+
+    @Override
+    public void setCommitSourceFolder(JsonEntity entity, String value) {
+        entity.setcommitSourceFolder(value);
     }
 }

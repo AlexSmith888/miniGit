@@ -1,5 +1,7 @@
 package infrastructure.entities;
 
+import infrastructure.storage.JsonData;
+
 import java.io.IOException;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
@@ -20,5 +22,10 @@ public interface FileSystemGateway {
     public void deleteRecursively(Path source, FileVisitor worker) throws IOException;
     public void eraseRecursively(Path source, FileVisitor worker) throws IOException;
     public void viewDifference(Path source, FileVisitor worker) throws IOException;
+    public void writeJsonToTheDisk(Path source, JsonData file) throws IOException;
 
+    public Path returnfullPath(Path path, String fileName) throws IOException;
+    public void printJson(Path path) throws IOException;
+    public void copyDirWithSuffix(Path source, Path destination) throws IOException;
+    public List<Path> listOfObjectsInFolder (Path source) throws IOException;
 }

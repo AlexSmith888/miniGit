@@ -28,28 +28,8 @@ public class History implements Request {
             }
             Path commit = Path.of(entity.returnSourceGitCommitDir()
                     + "/" + next + "/" + entity.returnMetaFile());
-            printInfo(commit);
+            entity.returnFileSystem().printJson(commit);
             queue.add(next);
-        }
-    }
-    public void  printInfo(Path path){
-        ObjectMapper json = new ObjectMapper();
-        try {
-
-            ObjectNode root = (ObjectNode) json.readTree(path.toFile());
-            String shortname = root.get("short").asText();
-            String hash = root.get("commit").asText();
-            String timestamp = root.get("timestamp").asText();
-            String source = root.get("source").asText();
-            String message = root.get("message").asText();
-
-            System.out.println(shortname + " " + message);
-            System.out.println(source + " " + timestamp);
-            System.out.println(hash);
-
-        } catch (IOException e) {
-            System.out.println("Impossible to read files in the directory : "
-                    + path.toFile());
         }
     }
 }

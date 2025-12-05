@@ -12,23 +12,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Restore implements Request {
-    //exists in utils and somewhere else
-    private Path returnfullPath(Path path, String meta){
-        ObjectMapper json = new ObjectMapper();
-        String longName = "";
-        try {
-            ObjectNode root = (ObjectNode) json.readTree(Path.of(path + "/" + meta).toFile());
-            longName = root.get("long").asText();
-        } catch (IOException e) {
-        }
-        return Path.of(path + "/" + longName);
-    }
-
     @Override
     public void execute(MIniGitRepository entity) throws IOException {
         Path source = Path.of(entity.returnSourceGitCommitDir()
                 + "/" + entity.returnCommitShort1());
-        source = returnfullPath(source, entity.returnMetaFile());
+        source =
+                entity.returnFileSystem().returnfullPath(
+                        source, entity.returnMetaFile());
 
         try {
             //track changes commit directory ---> temp

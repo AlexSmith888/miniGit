@@ -75,4 +75,8 @@ public class CachedRepositories implements RepositoriesGateway {
     public void removeFromCache(Path dir) throws IOException {
         miniGitDirectories.remove(dir);
     }
+    @Override
+    public void addToCache(Path dir) throws IOException {
+        miniGitDirectories.add(dir);
+    }
 }

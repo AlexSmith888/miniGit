@@ -5,15 +5,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-public class EncryptCommitPaths {
-    static private String data;
-    private static String hash;
-    static public void process(Path path) {
+public class PathCipher implements PathsEncryption{
+    private String data;
+    private String hash;
+
+    @Override
+    public void process(Path path) {
         data = path.toString()
                 + System.currentTimeMillis();
         hash = returnSHA1();
     }
-    static private String returnSHA1() {
+
+    private String returnSHA1() {
         byte[] digest = null;
         try {
             MessageDigest sh1 = MessageDigest.getInstance("SHA-1");
@@ -24,16 +27,23 @@ public class EncryptCommitPaths {
         return HexFormat.of().formatHex(digest).substring(11);
     }
 
-    static private String getData() {
+    @Override
+    public String getData() {
         return data;
     }
-    public static String getShortHash(){
+
+    @Override
+    public String getShortHash() {
         return hash.substring(0, 7);
     }
-    public static String getLongHash(){
+
+    @Override
+    public String getLongHash() {
         return hash.substring(7);
     }
-    public static String getHash(){
+
+    @Override
+    public String getHash() {
         return hash;
     }
 }

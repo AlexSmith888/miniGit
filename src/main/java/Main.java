@@ -3,6 +3,8 @@ import domain.services.RequestsDispatcher;
 import infrastructure.cache.CachedRepositories;
 import infrastructure.cache.CommitsCache;
 import infrastructure.cache.CommitsCacheUseCases;
+import infrastructure.encryption.PathCipher;
+import infrastructure.encryption.PathsEncryption;
 import infrastructure.entities.*;
 import infrastructure.filescomparison.ByteToByteComparator;
 import infrastructure.filescomparison.FilesComparator;
@@ -10,11 +12,12 @@ import infrastructure.filesystem.Cleaner;
 import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
+import infrastructure.storage.JsonEntity;
+import infrastructure.storage.JsonData;
 import utils.CLiParser;
 import app.validations.InputValidation;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Scanner;
 
 public class Main {
@@ -31,6 +34,9 @@ public class Main {
         Eraser eraser = new Eraser();
         Cleaner cleaner = new Cleaner();
         Viewer viewer = new Viewer(diff);
+
+        JsonEntity jsonFile = new JsonEntity();
+        PathsEncryption encrypt = new PathCipher();
 
         commitsCache.loadInMemory();
         repoGate.loadCachedDirs();
@@ -50,14 +56,23 @@ public class Main {
                 new InputValidation().isValid(
                         CLiParser.returnInitInput(text));
                 new RequestsDispatcher().process(
-                        CLiParser.returnInitInput(text), commitsGW
-                        ,repoGate, fsGate, copier, eraser, cleaner, viewer);
-
+                        CLiParser.returnInitInput(text)
+                        , commitsGW
+                        , repoGate
+                        , fsGate
+                        , copier
+                        , eraser
+                        , cleaner
+                        , viewer
+                        , jsonFile
+                        , encrypt);
             } catch (IllegalArgumentException e) {
                 System.out.println("Illegal input parameters");
                 System.out.println(e.getMessage());
             } catch (IOException e) {
                 System.out.println("Check whether directories / files exist");
+                System.out.println(e.getMessage());
+            } catch (RuntimeException e) {
                 System.out.println(e.getMessage());
             }
         }

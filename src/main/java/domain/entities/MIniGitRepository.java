@@ -1,5 +1,6 @@
 package domain.entities;
 
+import infrastructure.encryption.PathsEncryption;
 import infrastructure.entities.CommitsCacheGateway;
 import infrastructure.entities.FileSystemGateway;
 import infrastructure.entities.RepositoriesGateway;
@@ -7,6 +8,8 @@ import infrastructure.filesystem.Cleaner;
 import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
+import infrastructure.storage.JsonData;
+import infrastructure.storage.JsonEntity;
 
 import javax.swing.text.View;
 import java.nio.file.Path;
@@ -29,6 +32,8 @@ public class MIniGitRepository implements MiniGitEntity {
     private final Cleaner cleaner;
     private final Eraser eraser;
     private final Viewer viewer;
+    private final JsonEntity json;
+    private final PathsEncryption cipher;
 
     private MIniGitRepository(Builder builder) {
         this.sourceDir = builder.sourceDir;
@@ -48,6 +53,8 @@ public class MIniGitRepository implements MiniGitEntity {
         this.cleaner = builder.cleaner;
         this.eraser = builder.eraser;
         this.viewer = builder.viewer;
+        this.json = builder.json;
+        this.cipher = builder.cipher;
     }
 
     static public class Builder {
@@ -69,7 +76,17 @@ public class MIniGitRepository implements MiniGitEntity {
         private Cleaner cleaner;
         private Eraser eraser;
         private Viewer viewer;
+        private JsonEntity json;
+        private PathsEncryption cipher;
 
+        public Builder withHash  (PathsEncryption cipher){
+            this.cipher = cipher;
+            return this;
+        }
+        public Builder withJson  (JsonEntity json){
+            this.json = json;
+            return this;
+        }
         public Builder withViewer (Viewer viewer){
             this.viewer = viewer;
             return this;
@@ -198,4 +215,6 @@ public class MIniGitRepository implements MiniGitEntity {
     public Cleaner returnCleaner() {return cleaner;}
     public Eraser returnEraser() {return eraser;}
     public Viewer returnViewer() {return viewer;}
+    public JsonEntity returnJson() {return json;}
+    public PathsEncryption returnCipher() {return cipher;}
 }

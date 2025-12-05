@@ -1,6 +1,7 @@
 package domain.services;
 
 import domain.entities.MIniGitRepository;
+import infrastructure.encryption.PathsEncryption;
 import infrastructure.entities.CommitsCacheGateway;
 import infrastructure.entities.FileSystemGateway;
 import infrastructure.entities.RepositoriesGateway;
@@ -8,6 +9,8 @@ import infrastructure.filesystem.Cleaner;
 import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
+import infrastructure.storage.JsonData;
+import infrastructure.storage.JsonEntity;
 
 import java.io.IOException;
 
@@ -26,7 +29,9 @@ public class RequestsDispatcher {
             , Copier cp
             , Eraser er
             , Cleaner cl
-            , Viewer ve) throws IOException {
+            , Viewer ve
+            , JsonEntity jsonFile
+            , PathsEncryption enc) throws IOException {
         String command = rows[0];
         if (Requests.INIT.get().equals(command)) {
             check(command, rows);
@@ -79,7 +84,10 @@ public class RequestsDispatcher {
                     .withCommitsCache(commitsCache)
                     .withFileSystem(gw)
                     .withCopier(cp)
+                    .withJson(jsonFile)
+                    .withHash(enc)
                     .withCommand()
+                    .withMetaFile()
                     .withSourceDir()
                     .withSourceGitDir()
                     .withSourceGitTempDir()

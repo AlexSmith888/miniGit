@@ -1,15 +1,17 @@
 package infrastructure.entities;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import infrastructure.storage.JsonData;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.sql.DataTruncation;
 import java.util.List;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.Map;
 
 public class LocalFsTasksExecutor implements FileSystemGateway{
     @Override
@@ -35,6 +37,22 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
         if (!Files.exists(target)) {
             Files.copy(source, target);
         }
+    }
+    @Override
+    public void copyDirWithSuffix(Path source, Path destination) throws IOException {
+        Path target = Path.of(destination
+                + "/" + source.getFileName() + "_" + System.currentTimeMillis());
+        if (!Files.exists(target)) {
+            Files.copy(source, target);
+        }
+    }
+
+    @Override
+    public List<Path> listOfObjectsInFolder(Path source) throws IOException {
+        if (!Files.isDirectory(source)) {
+            throw new IOException("Not a directory");
+        }
+        return Files.list(source).toList();
     }
 
     @Override
@@ -102,5 +120,65 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
     @Override
     public void viewDifference(Path source, FileVisitor worker) throws IOException {
         Files.walkFileTree(source, worker);
+    }
+
+    @Override
+    public void writeJsonToTheDisk(Path source, JsonData file) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> data = Map.of(
+                "short", file.returnShortFolderIdentifier() == null ? "" : file.returnShortFolderIdentifier(),
+                "long", file.returnLongFolderIdentifier() == null ? "" : file.returnLongFolderIdentifier(),
+                "commit", file.returnFullFolderIdentifier() == null ? "" : file.returnFullFolderIdentifier(),
+                "timestamp", file.returnEventTimestamp() == null ? "" : file.returnEventTimestamp(),
+                "source", file.returnCommitSourceFolder() == null ? "" : file.returnCommitSourceFolder(),
+                "message", file.returnCommitMessage() == null ? "" : file.returnCommitMessage()
+        );
+
+        try {
+            mapper.writerWithDefaultPrettyPrinter()
+                    .writeValue(source.toFile(), data);
+            System.out.println("Attempting to save " +
+                    "a json file on the disk : " + source.getFileName());
+        } catch (IOException e) {
+            System.out.println("Failed to create a Json file");
+            throw e;
+        }
+    }
+
+    @Override
+    public Path returnfullPath(Path path, String fileName) throws IOException{
+        ObjectMapper json = new ObjectMapper();
+        String longName = "";
+        try {
+            ObjectNode root = (ObjectNode) json.readTree(Path.of(path + "/" + fileName).toFile());
+            longName = root.get("long").asText();
+        } catch (IOException e) {
+            System.out.println("Unable to resolve a full Json file path");
+            throw e;
+        }
+        return Path.of(path + "/" + longName);
+    }
+
+    @Override
+    public void printJson(Path path) throws IOException {
+        ObjectMapper json = new ObjectMapper();
+        try {
+
+            ObjectNode root = (ObjectNode) json.readTree(path.toFile());
+            String shortname = root.get("short").asText();
+            String hash = root.get("commit").asText();
+            String timestamp = root.get("timestamp").asText();
+            String source = root.get("source").asText();
+            String message = root.get("message").asText();
+
+            System.out.println(shortname + " " + message);
+            System.out.println(source + " " + timestamp);
+            System.out.println(hash);
+
+        } catch (IOException e) {
+            System.out.println("Impossible to read a Json file in the directory : "
+                    + path.toFile());
+            throw e;
+        }
     }
 }
