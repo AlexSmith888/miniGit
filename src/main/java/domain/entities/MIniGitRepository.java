@@ -1,5 +1,7 @@
 package domain.entities;
 
+import app.state.AppState;
+import app.state.StateManager;
 import infrastructure.encryption.PathsEncryption;
 import infrastructure.entities.CommitsCacheGateway;
 import infrastructure.entities.FileSystemGateway;
@@ -34,6 +36,7 @@ public class MIniGitRepository implements MiniGitEntity {
     private final Viewer viewer;
     private final JsonEntity json;
     private final PathsEncryption cipher;
+    private final StateManager state;
 
     private MIniGitRepository(Builder builder) {
         this.sourceDir = builder.sourceDir;
@@ -55,6 +58,7 @@ public class MIniGitRepository implements MiniGitEntity {
         this.viewer = builder.viewer;
         this.json = builder.json;
         this.cipher = builder.cipher;
+        this.state = builder.state;
     }
 
     static public class Builder {
@@ -78,7 +82,12 @@ public class MIniGitRepository implements MiniGitEntity {
         private Viewer viewer;
         private JsonEntity json;
         private PathsEncryption cipher;
+        private StateManager state;
 
+        public Builder withState  (StateManager state){
+            this.state = state;
+            return this;
+        }
         public Builder withHash  (PathsEncryption cipher){
             this.cipher = cipher;
             return this;
@@ -217,4 +226,5 @@ public class MIniGitRepository implements MiniGitEntity {
     public Viewer returnViewer() {return viewer;}
     public JsonEntity returnJson() {return json;}
     public PathsEncryption returnCipher() {return cipher;}
+    public StateManager returnState() {return state;}
 }

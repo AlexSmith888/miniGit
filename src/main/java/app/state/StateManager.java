@@ -13,31 +13,32 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class StateManager implements AppState{
-    private Path root = Path.of(System.getProperty("user.home"));
-    HashMap<String, String> commits = new HashMap<>();
-    HashMap<String, String> repoMatcher = new HashMap<>();
-    List<Path> repositories;
-    CommitsCacheGateway commitGw;
-    RepositoriesGateway repoGw;
-    FileSystemGateway fs;
-    Eraser eraser;
-    Copier copier;
-    Cleaner cleaner;
+    private HashMap<String, String> commits;
+    private Path root;
+    private final CommitsCacheGateway commitGw;
+    private final FileSystemGateway fs;
+    private final Eraser eraser;
+    private final Copier copier;
+    private final Cleaner cleaner;
 
-    public StateManager(
-            CommitsCacheGateway commitGw
-            , RepositoriesGateway repoGw
-            , FileSystemGateway fs
-            , Eraser er
-            , Copier cp
-            , Cleaner cl) {
+    public StateManager(CommitsCacheGateway commitGw, FileSystemGateway fs,
+                        Eraser eraser,
+                        Copier copier,
+                        Cleaner cleaner) {
         this.commitGw = commitGw;
-        this.repoGw = repoGw;
         this.fs = fs;
-        this.eraser = er;
-        this.copier = cp;
-        this.cleaner = cl;
-        this.root = Path.of(root + "/" + System.currentTimeMillis());
+        this.eraser = eraser;
+        this.copier = copier;
+        this.cleaner = cleaner;
+    }
+    public void setRoot(Path source){
+        this.root = source;
+    }
+    public Path getRoot() {
+        return root;
+    }
+    private Path getRootBackup() {
+        return Path.of(root.getParent() + "/" + System.currentTimeMillis());
     }
 
     @Override
@@ -50,78 +51,53 @@ public class StateManager implements AppState{
     public void recoverPreviousState() throws IOException {
         recoverCommits();
         recoverRepositories();
-        fs.deleteRecursively(root, eraser);
+        fs.deleteRecursively(getRootBackup(), eraser);
+    }
+    public void clean() throws IOException {
+        System.out.println("here");
+        fs.deleteRecursively(getRootBackup(), eraser);
     }
     private void saveRepositories() throws IOException {
-        System.out.println("Creating a directory to transfer repositories : "
-                +  root.toString());
-        fs.createDir(root);
-        repositories = new ArrayList<>(repoGw.returnCachedDirectories());
-        for (var path : repositories) {
-            Path target = Path.of(root + "/" + path.getFileName()
-                    + "_" + System.currentTimeMillis());
-            repoMatcher.put(path.toString(), target.toString());
-            fs.createDir(target);
-            copier.setSource(path);
-            copier.setTarget(target);
-            fs.copyRecursively(path, copier);
-            System.out.format("Copying %s to %s", path, target);
-            System.out.println("\n");
-        }
+        fs.createDir(getRootBackup());
+        copier.setSource(getRoot());
+        copier.setTarget(getRootBackup());
+        fs.copyRecursively(getRoot(), copier);
+
+        System.out.format("Copying %s to %s", getRoot(), getRootBackup());
+        System.out.println("\n");
     }
     private void recoverRepositories() throws IOException {
-        for (var current : repoMatcher.entrySet()) {
-            Path target = Path.of(current.getKey());
-            System.out.println("Cleaning target directories : " + target);
-            cleaner.addToExcludedList(target);
-            fs.deleteRecursively(target, cleaner);
-        }
-        List<String> targets = new ArrayList<>(repoMatcher.keySet());
-        for (var current : targets) {
-            Path source = Path.of(repoMatcher.get(current));
-            Path target = Path.of(current);
-            copier.setSource(source);
-            copier.setTarget(target);
-            System.out.println("Copying data from backup directory into the main : "
-                    + source + " ----> " + target);
-            fs.copyRecursively(source, copier);
-        }
+        cleaner.setSource(getRoot());
+        fs.deleteRecursively(getRoot(), cleaner);
 
-        for (var val : repoGw.returnCachedDirectories()) {
-            System.out.println("removing recent cached directories");
-            repoGw.removeFromCache(val);
-        }
-        for (var val : repositories) {
-            System.out.println("adding saved directories");
-            repoGw.addToCache(val);
-        }
+        copier.setSource(getRootBackup());
+        copier.setTarget(getRoot());
+        fs.copyRecursively(getRootBackup(), copier);
+
+        System.out.format("Copying %s to %s", getRoot(), getRootBackup());
+        System.out.println("\n");
     }
     private void saveCommits() throws IOException {
-        System.out.println("Saving commits in memory ... ");
-        for (var parent : repositories) {
-            commits.putAll(commitGw.retrieveSubtree(parent.toString()));
-        }
+        System.out.println("Storing all commits in memory");
+        commits = new HashMap<>(commitGw.retrieveSubtree(getRoot().toString()));
     }
     private void recoverCommits() throws IOException {
-        List<Path> current = repoGw.returnCachedDirectories();
-        for (var parent : current) {
-            System.out.println("removing commits based on their parent commit from memory");
-            commitGw.removeCommitsTree(parent);
+        if (commits.isEmpty()) {
+            return;
         }
-        for (var parent : repositories) {
-            System.out.println("adding commits to the tree based on their saved parental commits");
-            String par = parent.toString();
-            Queue<String> queue = new LinkedList<>();
-            queue.add(par);
-            while (!queue.isEmpty()) {
-                String curr = queue.poll();
-                if (curr.isEmpty()) {
-                    continue;
-                }
-                commitGw.addCommitToTree(parent, curr);
-                String next = commits.get(curr);
-                queue.add(next);
+        commitGw.removeCommitsTree(getRoot());
+        //!!! Wrong - use files, both for commits and dirs
+        /*String par = getRoot().toString();
+        Queue<String> queue = new LinkedList<>();
+        queue.add(par);
+        while (!queue.isEmpty()) {
+            String curr = queue.poll();
+            if (curr.isEmpty()) {
+                return;
             }
-        }
+            commitGw.addCommitToTree(getRoot(), curr);
+            String next = commits.get(curr);
+            queue.add(next);
+        }*/
     }
 }

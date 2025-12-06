@@ -56,13 +56,11 @@ public class Restore implements Request {
                 }
                 String child = map.get(parent);
                 entity.returnFileSystem().eraseRecursively(
-                        Path.of(entity.returnSourceGitCommitDir()
-                                + "/" + parent),
+                        Path.of(entity.returnSourceGitCommitDir() + "/" + parent),
                         entity.returnEraser()
                 );
                 queue.add(child);
             }
-
         } catch (IOException e) {
             System.out.println("Impossible to restore repo to the state of "
                     + entity.returnCommitShort1());

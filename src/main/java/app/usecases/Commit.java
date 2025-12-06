@@ -1,5 +1,6 @@
 package app.usecases;
 
+import app.state.StateContract;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
 import infrastructure.storage.JsonContract;
@@ -8,10 +9,13 @@ import infrastructure.storage.JsonEntity;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class Commit implements Request, JsonContract {
+public class Commit implements Request, JsonContract, StateContract {
 
     @Override
     public void execute(MIniGitRepository entity) throws IOException {
+        //setRootRepository(entity);
+        //entity.returnState().saveCurrentState();
+        //System.out.println("Root --- >" + entity.returnState().getRoot());;
         Path mainCommitDirectory ;
         Path mainDataCommitDirectory;
         try {
@@ -23,6 +27,7 @@ public class Commit implements Request, JsonContract {
             entity.returnFileSystem().createDir(mainCommitDirectory);
             entity.returnFileSystem().createDir(mainDataCommitDirectory);
         } catch (IOException e) {
+            //entity.returnState().recoverPreviousState();
             System.out.println("The issue while creating commit directories");
             throw e;
         }
@@ -35,6 +40,7 @@ public class Commit implements Request, JsonContract {
         } catch (IOException e) {
             System.out.println("Copying files to commit directories failed");
             System.out.println(e.getMessage());
+            //entity.returnState().recoverPreviousState();
             throw e;
         }
 
@@ -56,8 +62,10 @@ public class Commit implements Request, JsonContract {
 
         } catch (IOException e) {
             System.out.println("Failed to create a Json file");
+            //entity.returnState().recoverPreviousState();
             throw e;
         }
+        //entity.returnState().clean();
     }
 
     @Override
@@ -88,5 +96,10 @@ public class Commit implements Request, JsonContract {
     @Override
     public void setCommitSourceFolder(JsonEntity entity, String value) {
         entity.setcommitSourceFolder(value);
+    }
+
+    @Override
+    public void setRootRepository(MIniGitRepository repo) {
+        repo.returnState().setRoot(repo.returnSourceDir());
     }
 }

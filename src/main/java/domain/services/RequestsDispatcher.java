@@ -1,5 +1,7 @@
 package domain.services;
 
+import app.state.AppState;
+import app.state.StateManager;
 import domain.entities.MIniGitRepository;
 import infrastructure.encryption.PathsEncryption;
 import infrastructure.entities.CommitsCacheGateway;
@@ -31,7 +33,8 @@ public class RequestsDispatcher {
             , Cleaner cl
             , Viewer ve
             , JsonEntity jsonFile
-            , PathsEncryption enc) throws IOException {
+            , PathsEncryption enc
+            , StateManager appSt) throws IOException {
         String command = rows[0];
         if (Requests.INIT.get().equals(command)) {
             check(command, rows);
@@ -40,6 +43,7 @@ public class RequestsDispatcher {
                     .withRepositories(repoGW)
                     .withFileSystem(gw)
                     .withCopier(cp)
+                    .withState(appSt)
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitDir()
@@ -86,6 +90,7 @@ public class RequestsDispatcher {
                     .withCopier(cp)
                     .withJson(jsonFile)
                     .withHash(enc)
+                    .withState(appSt)
                     .withCommand()
                     .withMetaFile()
                     .withSourceDir()

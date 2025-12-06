@@ -1,3 +1,5 @@
+import app.state.AppState;
+import app.state.StateManager;
 import cli.GitInitializer;
 import domain.services.RequestsDispatcher;
 import infrastructure.cache.CachedRepositories;
@@ -17,6 +19,7 @@ import infrastructure.storage.JsonData;
 import utils.CLiParser;
 import app.validations.InputValidation;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -37,12 +40,12 @@ public class Main {
 
         JsonEntity jsonFile = new JsonEntity();
         PathsEncryption encrypt = new PathCipher();
+        StateManager state = new StateManager(commitsGW, fsGate, eraser, copier, cleaner);
 
         commitsCache.loadInMemory();
         repoGate.loadCachedDirs();
         Scanner scanner = new Scanner(System.in);
         String text;
-
         while (true) {
             GitInitializer.help();
             System.out.println(" > ");
@@ -51,7 +54,6 @@ public class Main {
             if (text.equals("exit")) {
                 break;
             }
-
             try {
                 new InputValidation().isValid(
                         CLiParser.returnInitInput(text));
@@ -65,7 +67,8 @@ public class Main {
                         , cleaner
                         , viewer
                         , jsonFile
-                        , encrypt);
+                        , encrypt,
+                        state);
             } catch (IllegalArgumentException e) {
                 System.out.println("Illegal input parameters");
                 System.out.println(e.getMessage());

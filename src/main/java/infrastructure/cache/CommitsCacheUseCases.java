@@ -63,18 +63,6 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
         commits.put(commit, "");
     }
 
-    private Path returnfullPath(Path path, String meta){
-        ObjectMapper json = new ObjectMapper();
-        String longName = "";
-        try {
-            ObjectNode root = (ObjectNode) json.readTree(Path.of(path + "/" + meta).toFile());
-            longName = root.get("long").asText();
-        } catch (IOException e) {
-            System.out.println("Failed to get a full path");
-        }
-        return Path.of(path + "/" + longName);
-    }
-
     @Override
     public String getLastCommitForParent(Path dir) {
 
@@ -120,6 +108,9 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
 
         while (!queue.isEmpty()) {
             String par = queue.poll();
+            if (par.isEmpty()) {
+                return map;
+            }
             String next = commits.get(par);
             if (next.isEmpty()) {
                 map.put(par, "");
