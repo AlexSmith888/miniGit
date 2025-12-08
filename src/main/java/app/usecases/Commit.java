@@ -1,6 +1,6 @@
 package app.usecases;
 
-import app.state.StateContract;
+import app.state.RequestState;
 import domain.services.Request;
 import domain.entities.MIniGitRepository;
 import infrastructure.storage.JsonContract;
@@ -9,14 +9,16 @@ import infrastructure.storage.JsonEntity;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class Commit implements Request, JsonContract, StateContract {
+public class Commit implements Request, JsonContract {
 
+    public void recoverAndClean(MIniGitRepository entity) throws IOException{
+        entity.returnState().recoverPreviousState(entity);
+        entity.returnState().clean(entity);
+    }
     @Override
     public void execute(MIniGitRepository entity) throws IOException {
-        //setRootRepository(entity);
-        //entity.returnState().saveCurrentState();
-        //System.out.println("Root --- >" + entity.returnState().getRoot());;
-        Path mainCommitDirectory ;
+        entity.returnState().saveCurrentState(entity);
+        Path mainCommitDirectory;
         Path mainDataCommitDirectory;
         try {
             entity.returnCipher().process(entity.returnSourceDir());
@@ -27,8 +29,8 @@ public class Commit implements Request, JsonContract, StateContract {
             entity.returnFileSystem().createDir(mainCommitDirectory);
             entity.returnFileSystem().createDir(mainDataCommitDirectory);
         } catch (IOException e) {
-            //entity.returnState().recoverPreviousState();
             System.out.println("The issue while creating commit directories");
+            recoverAndClean(entity);
             throw e;
         }
 
@@ -40,7 +42,7 @@ public class Commit implements Request, JsonContract, StateContract {
         } catch (IOException e) {
             System.out.println("Copying files to commit directories failed");
             System.out.println(e.getMessage());
-            //entity.returnState().recoverPreviousState();
+            recoverAndClean(entity);
             throw e;
         }
 
@@ -59,13 +61,12 @@ public class Commit implements Request, JsonContract, StateContract {
 
             entity.returnCommitsCache()
                     .addCommitToTree(entity.returnSourceDir(), entity.returnCipher().getShortHash());
-
         } catch (IOException e) {
             System.out.println("Failed to create a Json file");
-            //entity.returnState().recoverPreviousState();
+            recoverAndClean(entity);
             throw e;
         }
-        //entity.returnState().clean();
+        entity.returnState().clean(entity);
     }
 
     @Override
@@ -96,10 +97,5 @@ public class Commit implements Request, JsonContract, StateContract {
     @Override
     public void setCommitSourceFolder(JsonEntity entity, String value) {
         entity.setcommitSourceFolder(value);
-    }
-
-    @Override
-    public void setRootRepository(MIniGitRepository repo) {
-        repo.returnState().setRoot(repo.returnSourceDir());
     }
 }

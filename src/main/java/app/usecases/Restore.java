@@ -1,5 +1,6 @@
 package app.usecases;
 
+import app.state.RequestState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import domain.services.Request;
@@ -12,8 +13,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Restore implements Request {
+    private void recoverAndClean(MIniGitRepository entity) throws IOException{
+        entity.returnState().recoverPreviousState(entity);
+        entity.returnState().clean(entity);
+    }
     @Override
     public void execute(MIniGitRepository entity) throws IOException {
+        entity.returnState().saveCurrentState(entity);
         Path source = Path.of(entity.returnSourceGitCommitDir()
                 + "/" + entity.returnCommitShort1());
         source =
@@ -34,6 +40,7 @@ public class Restore implements Request {
             entity.returnCleaner().addToExcludedList(entity.returnSourceGitDir());
             entity.returnFileSystem().deleteRecursively(entity.returnSourceDir()
                     , entity.returnCleaner());
+            entity.returnCleaner().truncateExcludedList();
 
             entity.returnCopier().setSource(entity.returnSourceGitTempDir());
             entity.returnCopier().setTarget(entity.returnSourceDir());
@@ -65,7 +72,9 @@ public class Restore implements Request {
             System.out.println("Impossible to restore repo to the state of "
                     + entity.returnCommitShort1());
             System.out.println(e.getMessage());
+            recoverAndClean(entity);
             throw e;
         }
+        entity.returnState().clean(entity);
     }
 }

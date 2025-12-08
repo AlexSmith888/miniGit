@@ -1,6 +1,6 @@
 package domain.entities;
 
-import app.state.AppState;
+import app.state.RequestState;
 import app.state.StateManager;
 import infrastructure.encryption.PathsEncryption;
 import infrastructure.entities.CommitsCacheGateway;
@@ -10,10 +10,8 @@ import infrastructure.filesystem.Cleaner;
 import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
-import infrastructure.storage.JsonData;
 import infrastructure.storage.JsonEntity;
 
-import javax.swing.text.View;
 import java.nio.file.Path;
 
 public class MIniGitRepository implements MiniGitEntity {
@@ -21,6 +19,8 @@ public class MIniGitRepository implements MiniGitEntity {
     private final Path sourceGitDir;
     private final Path sourceGitTempDir;
     private final Path sourceGitCommitDir;
+    private final Path backupDirectory;
+    private final Path backupDirectoryData;
     private final String [] sourceRawData;
     private final String command;
     private final String commitMessage;
@@ -36,13 +36,16 @@ public class MIniGitRepository implements MiniGitEntity {
     private final Viewer viewer;
     private final JsonEntity json;
     private final PathsEncryption cipher;
-    private final StateManager state;
-
+    private final RequestState state;
+    private final Path listOfCommitsBack;
+    private final Path listOfReposBack;
     private MIniGitRepository(Builder builder) {
         this.sourceDir = builder.sourceDir;
         this.sourceGitDir = builder.sourceGitDir;
         this.sourceGitTempDir = builder.sourceGitTempDir;
         this.sourceGitCommitDir = builder.sourceGitCommitDir;
+        this.backupDirectory = builder.backupDirectory;
+        this.backupDirectoryData = builder.backupDirectoryData;
         this.sourceRawData = builder.sourceRawData;
         this.command = builder.command;
         this.commitMessage = builder.commitMessage;
@@ -59,6 +62,8 @@ public class MIniGitRepository implements MiniGitEntity {
         this.json = builder.json;
         this.cipher = builder.cipher;
         this.state = builder.state;
+        this.listOfCommitsBack = builder.listOfCommitsBack;
+        this.listOfReposBack = builder.listOfReposBack;
     }
 
     static public class Builder {
@@ -67,6 +72,8 @@ public class MIniGitRepository implements MiniGitEntity {
         private Path sourceGitDir;
         private Path sourceGitTempDir;
         private Path sourceGitCommitDir;
+        private Path backupDirectory;
+        private Path backupDirectoryData;
         private String [] sourceRawData;
         private String command;
         private String commitMessage;
@@ -82,9 +89,11 @@ public class MIniGitRepository implements MiniGitEntity {
         private Viewer viewer;
         private JsonEntity json;
         private PathsEncryption cipher;
-        private StateManager state;
+        private RequestState state;
+        private Path listOfCommitsBack;
+        private Path listOfReposBack;
 
-        public Builder withState  (StateManager state){
+        public Builder withState  (RequestState state){
             this.state = state;
             return this;
         }
@@ -176,6 +185,22 @@ public class MIniGitRepository implements MiniGitEntity {
             this.short2 = sourceRawData[3];
             return this;
         }
+        public Builder withBackup  (){
+            this.backupDirectory = Path.of(sourceDir.getParent() + "/backup");
+            return this;
+        }
+        public Builder withBackupDirectoryData  (){
+            this.backupDirectoryData = Path.of(backupDirectory + "/" + System.currentTimeMillis());;
+            return this;
+        }
+        public Builder withBackupRepos  (){
+            this.listOfReposBack = Path.of(backupDirectory + "/repos.txt");
+            return this;
+        }
+        public Builder withBackupCommits  (){
+            this.listOfCommitsBack = Path.of(backupDirectory + "/commits.txt");
+            return this;
+        }
 
         public MiniGitEntity build(){
             return new MIniGitRepository(this);
@@ -226,5 +251,9 @@ public class MIniGitRepository implements MiniGitEntity {
     public Viewer returnViewer() {return viewer;}
     public JsonEntity returnJson() {return json;}
     public PathsEncryption returnCipher() {return cipher;}
-    public StateManager returnState() {return state;}
+    public RequestState returnState() {return state;}
+    public Path returnBackupDirectory() {return backupDirectory;}
+    public Path returnBackupDataDirectory(){return backupDirectoryData;}
+    public Path returnBackupCommitsFile(){return listOfCommitsBack;}
+    public Path returnBackupReposFile(){return listOfReposBack;}
 }

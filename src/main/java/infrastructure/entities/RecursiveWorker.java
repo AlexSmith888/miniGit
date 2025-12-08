@@ -7,4 +7,6 @@ public interface RecursiveWorker {
     public void setTarget(Path target);
 
     public void addToExcludedList(Path path);
+
+    public void truncateExcludedList();
 }

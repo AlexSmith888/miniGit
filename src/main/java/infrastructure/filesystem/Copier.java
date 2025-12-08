@@ -19,7 +19,7 @@ public class Copier implements FileVisitor, RecursiveWorker {
 
     private Path source;
     private Path target;
-    private final List<Path> excluded = new ArrayList<>();
+    private List<Path> excluded = new ArrayList<>();
 
     @Override
     public void setSource(Path source) {
@@ -34,6 +34,11 @@ public class Copier implements FileVisitor, RecursiveWorker {
     @Override
     public void addToExcludedList(Path path) {
         excluded.add(path);
+    }
+
+    @Override
+    public void truncateExcludedList() {
+        excluded = new ArrayList<>();
     }
 
     @Override

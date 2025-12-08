@@ -102,6 +102,10 @@ public class CommitsCacheUseCases implements CommitsCacheGateway {
 
     @Override
     public HashMap<String, String> retrieveSubtree(String dir) {
+        if (commits.isEmpty() || !commits.containsKey(dir)) {
+            return new HashMap<>();
+        }
+
         HashMap<String, String> map = new HashMap<>();
         Queue<String> queue = new LinkedList<>();
         queue.add(dir);

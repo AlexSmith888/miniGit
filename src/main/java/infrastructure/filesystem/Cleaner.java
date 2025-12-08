@@ -17,7 +17,7 @@ import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 public class Cleaner implements RecursiveWorker, FileVisitor {
     private Path source;
     private Path target;
-    private final List<Path> excluded = new ArrayList<>();
+    private List<Path> excluded = new ArrayList<>();
 
     @Override
     public void setSource(Path source) {
@@ -32,6 +32,11 @@ public class Cleaner implements RecursiveWorker, FileVisitor {
     @Override
     public void addToExcludedList(Path path) {
         excluded.add(path);
+    }
+
+    @Override
+    public void truncateExcludedList() {
+        excluded = new ArrayList<>();
     }
 
     @Override

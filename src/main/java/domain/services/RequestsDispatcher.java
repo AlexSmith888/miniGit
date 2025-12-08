@@ -1,6 +1,5 @@
 package domain.services;
 
-import app.state.AppState;
 import app.state.StateManager;
 import domain.entities.MIniGitRepository;
 import infrastructure.encryption.PathsEncryption;
@@ -11,7 +10,6 @@ import infrastructure.filesystem.Cleaner;
 import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
-import infrastructure.storage.JsonData;
 import infrastructure.storage.JsonEntity;
 
 import java.io.IOException;
@@ -25,7 +23,8 @@ public class RequestsDispatcher {
         ValidationFactory.returnValidation(command)
                 .isValid(rows);
     }
-    public void process(String[] rows, CommitsCacheGateway commitsCache
+    public void process(String[] rows
+            , CommitsCacheGateway commitsCache
             , RepositoriesGateway repoGW
             , FileSystemGateway gw
             , Copier cp
@@ -41,14 +40,22 @@ public class RequestsDispatcher {
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
                     .withRepositories(repoGW)
+                    .withCommitsCache(commitsCache)
                     .withFileSystem(gw)
                     .withCopier(cp)
+                    .withCleaner(cl)
+                    .withEraser(er)
                     .withState(appSt)
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitDir()
                     .withSourceGitTempDir()
                     .withSourceGitCommitDir()
+                    .withBackupRepos()
+                    .withBackup()
+                    .withBackupDirectoryData()
+                    .withBackupCommits()
+                    .withBackupRepos()
                     .build());
             return;
         }
@@ -64,6 +71,15 @@ public class RequestsDispatcher {
                     .withSourceGitDir()
                     .withSourceGitTempDir()
                     .withSourceGitCommitDir()
+                    .withCommitsCache(commitsCache)
+                    .withRepositories(repoGW)
+                    .withEraser(er)
+                    .withState(appSt)
+                    .withBackupRepos()
+                    .withBackup()
+                    .withBackupDirectoryData()
+                    .withBackupCommits()
+                    .withBackupRepos()
                     .build());
             return;
         }
@@ -78,6 +94,14 @@ public class RequestsDispatcher {
                     .withCommand()
                     .withSourceDir()
                     .withSourceGitDir()
+                    .withCleaner(cl)
+                    .withCopier(cp)
+                    .withState(appSt)
+                    .withBackupRepos()
+                    .withBackup()
+                    .withBackupDirectoryData()
+                    .withBackupCommits()
+                    .withBackupRepos()
                     .build());
             return;
         }
@@ -86,11 +110,15 @@ public class RequestsDispatcher {
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
                     .withCommitsCache(commitsCache)
+                    .withRepositories(repoGW)
+                    .withBackupRepos()
                     .withFileSystem(gw)
                     .withCopier(cp)
                     .withJson(jsonFile)
                     .withHash(enc)
                     .withState(appSt)
+                    .withEraser(er)
+                    .withCleaner(cl)
                     .withCommand()
                     .withMetaFile()
                     .withSourceDir()
@@ -98,6 +126,10 @@ public class RequestsDispatcher {
                     .withSourceGitTempDir()
                     .withSourceGitCommitDir()
                     .withCommitMessage()
+                    .withBackup()
+                    .withBackupDirectoryData()
+                    .withBackupCommits()
+                    .withBackupRepos()
                     .build());
             return;
         }
@@ -134,17 +166,24 @@ public class RequestsDispatcher {
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
                     .withRawData(rows)
                     .withCommitsCache(commitsCache)
+                    .withRepositories(repoGW)
                     .withFileSystem(gw)
                     .withCopier(cp)
                     .withCleaner(cl)
                     .withEraser(er)
                     .withCommand()
                     .withSourceDir()
-                    .withMetaFile()
                     .withSourceGitCommitDir()
                     .withSourceGitDir()
-                    .withCommitName1()
                     .withSourceGitTempDir()
+                    .withMetaFile()
+                    .withCommitName1()
+                    .withState(appSt)
+                    .withBackupRepos()
+                    .withBackup()
+                    .withBackupDirectoryData()
+                    .withBackupCommits()
+                    .withBackupRepos()
                     .build());
             return;
         }

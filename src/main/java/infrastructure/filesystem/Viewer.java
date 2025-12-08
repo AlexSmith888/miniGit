@@ -36,6 +36,11 @@ public class Viewer implements FileVisitor, RecursiveWorker {
     }
 
     @Override
+    public void truncateExcludedList() {
+
+    }
+
+    @Override
     public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) throws IOException {
         Path current = (Path) dir;
         if (dir.equals(source)) {

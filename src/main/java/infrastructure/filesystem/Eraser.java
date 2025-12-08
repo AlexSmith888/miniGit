@@ -34,6 +34,11 @@ public class Eraser implements RecursiveWorker, FileVisitor {
     }
 
     @Override
+    public void truncateExcludedList() {
+
+    }
+
+    @Override
     public FileVisitResult preVisitDirectory(Object dir, BasicFileAttributes attrs) throws IOException {
         return CONTINUE;
     }

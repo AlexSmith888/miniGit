@@ -1,4 +1,3 @@
-import app.state.AppState;
 import app.state.StateManager;
 import cli.GitInitializer;
 import domain.services.RequestsDispatcher;
@@ -15,11 +14,9 @@ import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
 import infrastructure.storage.JsonEntity;
-import infrastructure.storage.JsonData;
 import utils.CLiParser;
 import app.validations.InputValidation;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -40,7 +37,7 @@ public class Main {
 
         JsonEntity jsonFile = new JsonEntity();
         PathsEncryption encrypt = new PathCipher();
-        StateManager state = new StateManager(commitsGW, fsGate, eraser, copier, cleaner);
+        StateManager state = new StateManager();
 
         commitsCache.loadInMemory();
         repoGate.loadCachedDirs();
@@ -73,7 +70,7 @@ public class Main {
                 System.out.println("Illegal input parameters");
                 System.out.println(e.getMessage());
             } catch (IOException e) {
-                System.out.println("Check whether directories / files exist");
+                System.out.println("Check whether directories / files exist, user rights");
                 System.out.println(e.getMessage());
             } catch (RuntimeException e) {
                 System.out.println(e.getMessage());
