@@ -24,21 +24,21 @@ miniGit
  |  |--cache (in memory caches and related functionality)  
  |  |--encryption (encrypts an input to produce hashed output)  
  |  |--filesystem (a fat gateway to work with an underlying file system)  
- |  |--storage (Json serialization / deserialization to store requests' metadata)
+ |  |--storage (Json serialization / deserialization to store requests' metadata)  
 ***Requests Examples***  
-    - init /folder1/folder2  
+    - ***init*** /folder1/folder2  
     after completion creates miniGit folder under /folder1/folder2  
-    - track /folder1/folfer2  
+    - ***track*** /folder1/folfer2  
     mirrors changes in /folder1/folder2 under /miniGit/temp folder  
-    - commit /folder1/folder2 "initial" (message is strictly required)  
+    - ***commit*** /folder1/folder2 "initial" ***(message is strictly required)***    
     creates a "snapshot" of  /miniGit/temp under /miniGit/commits/shortHash/longhash/  
-    - history /folder1/folder2  
+    - ***history*** /folder1/folder2  
     lists all existing commits for /folder1/folder2  
-    - diff /folder1/folder2 34fer5 87grt1 (where 34fer5 87grt1 are short commit names)  
+    - ***diff*** /folder1/folder2 34fer5 87grt1 (where 34fer5 87grt1 are short commit names)  
     demonstrates differences between two commits - added/changed/deleted directories / files  
-    - undo /folder1/folder2  
+    - ***undo*** /folder1/folder2  
     removes miniGit folder under /folder1/folder2, stops tracking repository  
-    - restore /folder1/folder2 45tryoi23 (where 45tryoi23 is a short commit name)  
+    - ***restore*** /folder1/folder2 45tryoi23 (where 45tryoi23 is a short commit name)  
     rolls back the state of a working repository and its subfolders to a particular commit
 
     
