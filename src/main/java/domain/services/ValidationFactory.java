@@ -3,6 +3,8 @@ package domain.services;
 import app.validations.*;
 import domain.validators.Validation;
 
+import java.util.logging.Logger;
+
 public class ValidationFactory {
     public static Validation returnValidation(String command) {
         if (Requests.INIT.get().equals(command)) {

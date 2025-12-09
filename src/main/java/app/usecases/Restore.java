@@ -69,9 +69,9 @@ public class Restore implements Request {
                 queue.add(child);
             }
         } catch (IOException e) {
-            System.out.println("Impossible to restore repo to the state of "
-                    + entity.returnCommitShort1());
-            System.out.println(e.getMessage());
+            entity.returnLogger().error("Impossible to restore repo to the state of {}"
+                    , entity.returnCommitShort1());
+            entity.returnLogger().error(e.getMessage());
             recoverAndClean(entity);
             throw e;
         }

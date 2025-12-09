@@ -11,6 +11,8 @@ import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
 import infrastructure.storage.JsonEntity;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.util.Loader;
 
 import java.nio.file.Path;
 
@@ -39,6 +41,7 @@ public class MIniGitRepository implements MiniGitEntity {
     private final RequestState state;
     private final Path listOfCommitsBack;
     private final Path listOfReposBack;
+    Logger logger;
     private MIniGitRepository(Builder builder) {
         this.sourceDir = builder.sourceDir;
         this.sourceGitDir = builder.sourceGitDir;
@@ -64,6 +67,7 @@ public class MIniGitRepository implements MiniGitEntity {
         this.state = builder.state;
         this.listOfCommitsBack = builder.listOfCommitsBack;
         this.listOfReposBack = builder.listOfReposBack;
+        this.logger = builder.logger;
     }
 
     static public class Builder {
@@ -92,7 +96,12 @@ public class MIniGitRepository implements MiniGitEntity {
         private RequestState state;
         private Path listOfCommitsBack;
         private Path listOfReposBack;
+        private Logger logger;
 
+        public Builder withLogger  (Logger logger){
+            this.logger = logger;
+            return this;
+        }
         public Builder withState  (RequestState state){
             this.state = state;
             return this;
@@ -256,4 +265,5 @@ public class MIniGitRepository implements MiniGitEntity {
     public Path returnBackupDataDirectory(){return backupDirectoryData;}
     public Path returnBackupCommitsFile(){return listOfCommitsBack;}
     public Path returnBackupReposFile(){return listOfReposBack;}
+    public Logger returnLogger(){return logger;}
 }

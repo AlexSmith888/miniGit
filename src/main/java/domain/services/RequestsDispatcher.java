@@ -11,6 +11,8 @@ import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
 import infrastructure.storage.JsonEntity;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.util.Loader;
 
 import java.io.IOException;
 
@@ -33,11 +35,13 @@ public class RequestsDispatcher {
             , Viewer ve
             , JsonEntity jsonFile
             , PathsEncryption enc
-            , StateManager appSt) throws IOException {
+            , StateManager appSt
+            , Logger logger) throws IOException {
         String command = rows[0];
         if (Requests.INIT.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withRepositories(repoGW)
                     .withCommitsCache(commitsCache)
@@ -62,6 +66,7 @@ public class RequestsDispatcher {
         if (Requests.TRACK.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withFileSystem(gw)
                     .withCopier(cp)
@@ -86,6 +91,7 @@ public class RequestsDispatcher {
         if (Requests.UNDO.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withCommitsCache(commitsCache)
                     .withRepositories(repoGW)
@@ -108,6 +114,7 @@ public class RequestsDispatcher {
         if (Requests.COMMIT.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withCommitsCache(commitsCache)
                     .withRepositories(repoGW)
@@ -136,6 +143,7 @@ public class RequestsDispatcher {
         if (Requests.HISTORY.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withCommitsCache(commitsCache)
                     .withFileSystem(gw)
@@ -149,6 +157,7 @@ public class RequestsDispatcher {
         if (Requests.DIFF.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withFileSystem(gw)
                     .withViewer(ve)
@@ -164,6 +173,7 @@ public class RequestsDispatcher {
         if (Requests.RESTORE.get().equals(command)) {
             check(command, rows);
             assemble((MIniGitRepository) new MIniGitRepository.Builder()
+                    .withLogger(logger)
                     .withRawData(rows)
                     .withCommitsCache(commitsCache)
                     .withRepositories(repoGW)

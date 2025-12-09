@@ -15,15 +15,21 @@ public class StateManager implements RequestState {
     @Override
     public void saveCurrentState(MIniGitRepository gitRepo) throws IOException {
         gitRepo.returnFileSystem().createDir(gitRepo.returnBackupDirectory());
+        gitRepo.returnLogger().info("Saving current state : {} created", gitRepo.returnBackupDirectory());
         gitRepo.returnFileSystem().createDir(gitRepo.returnBackupDataDirectory());
+        gitRepo.returnLogger().info("Saving current state : {} created", gitRepo.returnBackupDataDirectory());
         gitRepo.returnCopier().setSource(gitRepo.returnSourceDir());
         gitRepo.returnCopier().setTarget(gitRepo.returnBackupDataDirectory());
         gitRepo.returnFileSystem().copyRecursively(gitRepo.returnSourceDir(), gitRepo.returnCopier());
+        gitRepo.returnLogger().info("Saving current state : {} copied to {}"
+                , gitRepo.returnSourceDir(), gitRepo.returnBackupDataDirectory());
 
         commits =
                 new HashMap<>(gitRepo.returnCommitsCache().retrieveSubtree(gitRepo.returnSourceDir().toString()));
         dirs =
                 new ArrayList<>(gitRepo.returnRepos().returnCachedDirectories());
+
+        gitRepo.returnLogger().info("Saving current state : internal app caches saved");
 
         gitRepo.returnFileSystem().createFile(gitRepo.returnBackupCommitsFile());
         gitRepo.returnFileSystem().createFile(gitRepo.returnBackupReposFile());
@@ -34,12 +40,14 @@ public class StateManager implements RequestState {
                         gitRepo.returnBackupCommitsFile(),
                         entry.getKey() + " " + entry.getValue());
             }
+            gitRepo.returnLogger().info("Saving current state : commits cache flushed on the disk");
         }
         if (!dirs.isEmpty()) {
             for (var entry : dirs) {
                 gitRepo.returnFileSystem().appendArowToTheFile(
                         gitRepo.returnBackupCommitsFile(),entry.toString());
             }
+            gitRepo.returnLogger().info("Saving current state : repositories cache flushed on the disk");
         }
     }
 
@@ -47,6 +55,8 @@ public class StateManager implements RequestState {
     public void recoverPreviousState(MIniGitRepository gitRepo) throws IOException {
         gitRepo.returnFileSystem().removeFile(gitRepo.returnBackupCommitsFile());
         gitRepo.returnFileSystem().removeFile(gitRepo.returnBackupReposFile());
+        gitRepo.returnLogger().info("Recovery : both {} and {} have been deleted"
+                , gitRepo.returnBackupCommitsFile(), gitRepo.returnBackupReposFile());
 
         if (!gitRepo.returnFileSystem().isDirExists(gitRepo.returnSourceDir())) {
             gitRepo.returnFileSystem().createDir(gitRepo.returnSourceDir());
@@ -59,6 +69,8 @@ public class StateManager implements RequestState {
         gitRepo.returnCopier().setTarget(gitRepo.returnSourceDir());
         gitRepo.returnFileSystem().copyRecursively(gitRepo.returnBackupDataDirectory()
                 , gitRepo.returnCopier());
+        gitRepo.returnLogger().info("Recovery : data copied from backup {} to {}", gitRepo.returnBackupDataDirectory()
+                , gitRepo.returnSourceDir());
 
         if (!commits.isEmpty()) {
             gitRepo.returnCommitsCache().removeCommitsTree(gitRepo.returnSourceDir());
@@ -73,6 +85,7 @@ public class StateManager implements RequestState {
                 gitRepo.returnCommitsCache().addCommitToTree(gitRepo.returnSourceDir(), curr);
                 queue.add(commits.get(curr));
             }
+            gitRepo.returnLogger().info("Recovery : commits' tree recreated in the cache");
         }
 
         if (!dirs.isEmpty()) {
@@ -88,6 +101,7 @@ public class StateManager implements RequestState {
                     gitRepo.returnRepos().addToCache(value);
                 }
             }
+            gitRepo.returnLogger().info("Recovery : repositories recreated in the cache");
         }
     }
 

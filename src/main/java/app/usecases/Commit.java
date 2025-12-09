@@ -29,7 +29,7 @@ public class Commit implements Request, JsonContract {
             entity.returnFileSystem().createDir(mainCommitDirectory);
             entity.returnFileSystem().createDir(mainDataCommitDirectory);
         } catch (IOException e) {
-            System.out.println("The issue while creating commit directories");
+            entity.returnLogger().warn("The issue while creating miniGit repositories");
             recoverAndClean(entity);
             throw e;
         }
@@ -40,8 +40,8 @@ public class Commit implements Request, JsonContract {
             entity.returnFileSystem().copyRecursively(entity.returnSourceGitTempDir()
                     , entity.returnCopier());
         } catch (IOException e) {
-            System.out.println("Copying files to commit directories failed");
-            System.out.println(e.getMessage());
+            entity.returnLogger().error("Copying files to commit directories failed");
+            entity.returnLogger().error(e.getMessage());
             recoverAndClean(entity);
             throw e;
         }
@@ -62,7 +62,7 @@ public class Commit implements Request, JsonContract {
             entity.returnCommitsCache()
                     .addCommitToTree(entity.returnSourceDir(), entity.returnCipher().getShortHash());
         } catch (IOException e) {
-            System.out.println("Failed to create a Json file");
+            entity.returnLogger().error("Failed to create a Json file");
             recoverAndClean(entity);
             throw e;
         }

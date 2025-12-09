@@ -31,8 +31,8 @@ public class Init implements Request {
                     ,entity.returnCopier());
             entity.returnCopier().truncateExcludedList();
         } catch (IOException e) {
-            System.out.println("Impossible to create a miniGit repository");
-            System.out.println(e.getMessage());
+            entity.returnLogger().error("Impossible to create a miniGit repository");
+            entity.returnLogger().error(e.getMessage());
             recoverAndClean(entity);
             throw e;
         }

@@ -25,11 +25,11 @@ public class Track implements Request {
                     ,entity.returnCopier());
             entity.returnCopier().truncateExcludedList();
         } catch (IOException e) {
-            System.out.println("Impossible to track changes");
-            System.out.println(e.getMessage());
+            entity.returnLogger().error("Impossible to track changes");
+            entity.returnLogger().error(e.getMessage());
             recoverAndClean(entity);
             throw e;
         }
-        //entity.returnState().clean(entity);
+        entity.returnState().clean(entity);
     }
 }

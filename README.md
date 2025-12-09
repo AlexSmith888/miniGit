@@ -10,8 +10,8 @@ The project is an intentionally simple single threaded app at hand engineered wi
     - Caching architecture  
     - CLI interface  
     - Pluggable functionality for easy extensibility  
-***Essential Architectural Features***
-miniGit  
+***Essential Architectural Features***  
+***miniGit***    
  |--app  
  |  |--state (after request recovery)  
  |  |--usecases (commit, diff, undo, etc..)  

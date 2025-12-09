@@ -3,6 +3,8 @@ package infrastructure.entities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import infrastructure.storage.JsonData;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.util.Loader;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 public class LocalFsTasksExecutor implements FileSystemGateway{
+    private final Logger logger;
+
+    public LocalFsTasksExecutor(Logger logger) {
+        this.logger = logger;
+    }
     @Override
     public void createDir(Path path) throws IOException {
         if (!Files.exists(path)) {
@@ -137,10 +144,11 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
         try {
             mapper.writerWithDefaultPrettyPrinter()
                     .writeValue(source.toFile(), data);
-            System.out.println("Attempting to save " +
-                    "a json file on the disk : " + source.getFileName());
+            logger.info("Json metadata file created on the disk : {}"
+                    , source.getFileName());
         } catch (IOException e) {
-            System.out.println("Failed to create a Json file");
+            logger.error("Failed to create a Json file");
+            logger.error(e.getMessage());
             throw e;
         }
     }
@@ -153,7 +161,8 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
             ObjectNode root = (ObjectNode) json.readTree(Path.of(path + "/" + fileName).toFile());
             longName = root.get("long").asText();
         } catch (IOException e) {
-            System.out.println("Unable to resolve a full Json file path");
+            logger.error("Impossible to retrieve a requested Json file {}", fileName);
+            logger.error(e.getMessage());
             throw e;
         }
         return Path.of(path + "/" + longName);
@@ -176,8 +185,7 @@ public class LocalFsTasksExecutor implements FileSystemGateway{
             System.out.println(hash);
 
         } catch (IOException e) {
-            System.out.println("Impossible to read a Json file in the directory : "
-                    + path.toFile());
+            logger.error("Impossible to read a Json file in the directory : {}", path.toFile());
             throw e;
         }
     }

@@ -1,5 +1,7 @@
 package infrastructure.entities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -12,7 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LocalFsTasksExecutorTest {
-
+    private static final Logger logger = (Logger) LogManager.getLogger(LocalFsTasksExecutor.class);
     String root = System.getProperty("user.home");
     LocalFsTasksExecutor instance;
     Path Directory1;
@@ -23,7 +25,7 @@ public class LocalFsTasksExecutorTest {
     @BeforeEach
     void setUp(){
         long time = System.currentTimeMillis();
-        instance = new LocalFsTasksExecutor();
+        instance = new LocalFsTasksExecutor(logger);
         Directory1 = Path.of(root + "/temporary1" + time);
         Directory2 = Path.of(root + "/temporary2" + time);
         File1 = "test1.txt";

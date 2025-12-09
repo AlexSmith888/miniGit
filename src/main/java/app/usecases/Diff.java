@@ -29,7 +29,7 @@ public class Diff implements Request {
             entity.returnViewer().setTarget(dir2);
             entity.returnFileSystem().viewDifference(dir1, entity.returnViewer());
         } catch (IOException e) {
-            System.out.println("Failed to complete diff request ");
+            entity.returnLogger().error("Failed to complete diff request");
             throw e;
         }
     }

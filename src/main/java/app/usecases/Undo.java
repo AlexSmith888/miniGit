@@ -23,8 +23,8 @@ public class Undo implements Request {
             entity.returnCommitsCache()
                     .removeCommitsTree(entity.returnSourceDir());
         } catch (IOException e) {
-            System.out.println("Impossible to delete miniGit folder");
-            System.out.println(e.getMessage());
+            entity.returnLogger().error("Impossible to delete miniGit folder");
+            entity.returnLogger().error(e.getMessage());
             recoverAndClean(entity);
             throw e;
         }

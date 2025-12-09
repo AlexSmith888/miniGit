@@ -14,6 +14,8 @@ import infrastructure.filesystem.Copier;
 import infrastructure.filesystem.Eraser;
 import infrastructure.filesystem.Viewer;
 import infrastructure.storage.JsonEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import utils.CLiParser;
 import app.validations.InputValidation;
 
@@ -21,9 +23,11 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
+    private static final Logger logger = (Logger) LogManager.getLogger(Main.class);
     public static void main(String[] args) throws IOException {
-        GitInitializer.launch();
-        FileSystemGateway fsGate = new LocalFsTasksExecutor();
+        GitInitializer initializer = new GitInitializer(logger);
+        initializer.launch();
+        FileSystemGateway fsGate = new LocalFsTasksExecutor(logger);
         CommitsCacheLoader commitsCache = new CommitsCache(fsGate);
         RepositoriesGateway repoGate = new CachedRepositories(fsGate);
         CommitsCacheGateway commitsGW = new CommitsCacheUseCases(
@@ -51,6 +55,10 @@ public class Main {
             if (text.equals("exit")) {
                 break;
             }
+            if (text.startsWith("help")) {
+                initializer.commandResolver(text);
+                continue;
+            }
             try {
                 new InputValidation().isValid(
                         CLiParser.returnInitInput(text));
@@ -64,22 +72,24 @@ public class Main {
                         , cleaner
                         , viewer
                         , jsonFile
-                        , encrypt,
-                        state);
+                        , encrypt
+                        , state
+                        , logger);
             } catch (IllegalArgumentException e) {
-                System.out.println("Illegal input parameters");
-                System.out.println(e.getMessage());
+                logger.warn("Illegal input parameters");
+                logger.warn(e.getMessage());
             } catch (IOException e) {
-                System.out.println("Check whether directories / files exist, user rights");
-                System.out.println(e.getMessage());
+                logger.error("Impossible to read / copy / change directories " +
+                        "/ files under miniGit maintenance ");
+                logger.error(e.getMessage());
             } catch (RuntimeException e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage());
             }
         }
 
         scanner.close();
         commitsCache.flushToTheDisk();
         repoGate.unLoadCachedDirs();
-        GitInitializer.finish();
+        initializer.finish();
     }
 }
