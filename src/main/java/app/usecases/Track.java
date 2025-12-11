@@ -6,6 +6,10 @@ import domain.entities.MIniGitRepository;
 import java.io.IOException;
 
 public class Track implements Request {
+    /*
+    Tracks and applies changes in the user's repository against the staging area (temp folder)
+    upon completion user's directory state == /temp and might be commited
+    **/
     private void recoverAndClean(MIniGitRepository entity) throws IOException{
         entity.returnState().recoverPreviousState(entity);
         entity.returnState().clean(entity);

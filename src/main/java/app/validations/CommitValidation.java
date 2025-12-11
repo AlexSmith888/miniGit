@@ -10,7 +10,7 @@ public class CommitValidation implements Validation {
     public void isValid(String[] item) throws IllegalArgumentException {
         if (item.length < 3) {
             throw new IllegalArgumentException("Requires a {commit}" +
-                    "{ path}{ \"message - either blank or not\"}}");
+                    "{path}{\"message - either blank or not\"}}");
         }
 
         Path directory = Path.of(item[1]);

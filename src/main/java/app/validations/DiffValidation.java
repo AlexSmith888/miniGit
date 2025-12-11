@@ -11,8 +11,7 @@ public class DiffValidation implements Validation {
     @Override
     public void isValid(String[] item) throws IllegalArgumentException {
         if (item.length < 4) {
-            throw new IllegalArgumentException("Requires a command, directory" +
-                    ", and two short commit names");
+            throw new IllegalArgumentException("Requires a command, directory, and two short commit names");
         }
 
         Path directory = Path.of(item[1]);

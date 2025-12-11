@@ -6,6 +6,13 @@ import domain.entities.MIniGitRepository;
 import java.io.IOException;
 
 public class Init implements Request {
+    /*
+    Creates a folder structure under current user's repository
+    temp == staging area for changes
+    (track command is used to translate changes from user's directory to staging area)
+    commits == snapshots of temp folder in time with related metadata
+
+    * */
     private void recoverAndClean(MIniGitRepository entity) throws IOException{
         entity.returnState().recoverPreviousState(entity);
         entity.returnState().clean(entity);

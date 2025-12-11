@@ -13,6 +13,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Restore implements Request {
+    /*
+    restores the state of the user's working directory and miniGitTemp directory
+    to the state of a previous commit back in time
+    the operation is irreversible and all changes will be lost after applying
+    including the descendants of the restored commit
+    a->b->c : restore a = a->
+    **/
     private void recoverAndClean(MIniGitRepository entity) throws IOException{
         entity.returnState().recoverPreviousState(entity);
         entity.returnState().clean(entity);

@@ -6,6 +6,10 @@ import domain.entities.MIniGitRepository;
 import java.io.IOException;
 
 public class Undo implements Request {
+    /*
+    Removes miniGit commit tree directories structure under user's repository
+    stops tracking a repository
+    * */
     private void recoverAndClean(MIniGitRepository entity) throws IOException{
         entity.returnState().recoverPreviousState(entity);
         entity.returnState().clean(entity);

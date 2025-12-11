@@ -22,6 +22,11 @@ public class Commit implements Request, JsonContract {
         Path mainDataCommitDirectory;
         try {
             entity.returnCipher().process(entity.returnSourceDir());
+            //miniGit uses first symbols of an obtained hash value to store
+            //metadata about the current commit in the meta.json file
+            //and related data in a separate folder
+            //that uses the rest symbols of the hash value
+            // miniGit / commits/ short part / long part /
             mainCommitDirectory = entity.returnSourceGitCommitDir().resolve(
                     entity.returnCipher().getShortHash());
             mainDataCommitDirectory = mainCommitDirectory.resolve(
@@ -35,6 +40,7 @@ public class Commit implements Request, JsonContract {
         }
 
         try {
+            //copy data in a current state from working directory to a newly created commit folder
             entity.returnCopier().setSource(entity.returnSourceGitTempDir());
             entity.returnCopier().setTarget(mainDataCommitDirectory);
             entity.returnFileSystem().copyRecursively(entity.returnSourceGitTempDir()
@@ -48,6 +54,7 @@ public class Commit implements Request, JsonContract {
 
         try {
 
+            //extract all necessary information to create the meta.json file
             setShortFolderIdentifier(entity.returnJson(), entity.returnCipher().getShortHash());
             setLongFolderIdentifier(entity.returnJson(), entity.returnCipher().getLongHash());
             setFullFolderIdentifier(entity.returnJson(), entity.returnCipher().getHash());
