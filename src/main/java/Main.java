@@ -62,7 +62,7 @@ public class Main {
         //use SHA-1 to has data
         PathsEncryption encrypt = new PathCipher();
         //safe recovery after incomplete requests
-        //if something go wrong, the app returns safely to a previous working state
+        //if something goes wrong, the app returns safely to a previous working state
         //without applying partial / incomplete changes
         StateManager state = new StateManager();
 
